@@ -262,12 +262,53 @@ em {
   color: var(--muted);
 }
 
+/* ---------- Responsive: tablets & phones ---------- */
 @media (max-width: 720px) {
+  .nav {
+    padding: 1rem var(--pad);
+  }
+  .nav__links {
+    gap: 1.1rem;
+    font-size: 0.78rem;
+  }
+
+  .hero__content {
+    inset: auto var(--pad) 16% var(--pad);
+  }
+  .hero__scroll {
+    inset: auto auto 1.25rem var(--pad);
+  }
+
   .work__item {
     grid-template-columns: 2rem 1fr;
   }
   .work__blurb,
   .work__tag {
     display: none;
+  }
+
+  .contact__footer {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+/* Very small phones: keep the hero title from colliding with the nav. */
+@media (max-width: 380px) {
+  .hero__title {
+    font-size: 2.1rem;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

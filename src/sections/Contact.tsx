@@ -1,18 +1,17 @@
+import { site } from "../content/site";
+
 export default function Contact() {
+  const { contact } = site;
   return (
     <section className="section contact" id="contact">
-      <p className="section__index">03 — Contact</p>
-      <h2 className="contact__lead">
-        Let&apos;s build
-        <br />
-        something.
-      </h2>
-      <a className="contact__mail" href="mailto:qinchuan@usc.edu">
-        qinchuan@usc.edu
+      <p className="section__index">{contact.index}</p>
+      <h2 className="contact__lead">{contact.lead}</h2>
+      <a className="contact__mail" href={`mailto:${site.email}`}>
+        {site.email}
       </a>
       <footer className="contact__footer">
         <span>© {new Date().getFullYear()}</span>
-        <span>Built with React · Three.js · GSAP</span>
+        <span>{contact.footerNote}</span>
       </footer>
     </section>
   );

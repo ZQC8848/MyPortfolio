@@ -1,16 +1,12 @@
-const projects = [
-  { title: "Project One", tag: "WebGL · 2025", blurb: "A particle-driven product launch page." },
-  { title: "Project Two", tag: "React · 2025", blurb: "Design system and marketing site rebuild." },
-  { title: "Project Three", tag: "Motion · 2024", blurb: "Scroll-narrative case study experience." },
-  { title: "Project Four", tag: "Creative · 2024", blurb: "Interactive identity for a studio." },
-];
+import { site } from "../content/site";
 
 export default function Work() {
+  const { work } = site;
   return (
     <section className="section work" id="work">
-      <p className="section__index">02 — Selected work</p>
+      <p className="section__index">{work.index}</p>
       <ul className="work__list">
-        {projects.map((p, i) => (
+        {work.projects.map((p, i) => (
           <li className="work__item" key={p.title}>
             <span className="work__num">{String(i + 1).padStart(2, "0")}</span>
             <span className="work__title">{p.title}</span>
