@@ -1,15 +1,6 @@
-import { Suspense } from "react";
-import ParticleMorph from "../three/ParticleMorph";
-
 export default function Hero() {
   return (
     <section className="hero" id="top">
-      <div className="hero__canvas">
-        <Suspense fallback={null}>
-          <ParticleMorph />
-        </Suspense>
-      </div>
-
       <div className="hero__content">
         <p className="hero__eyebrow">Designer · Developer</p>
         <h1 className="hero__title">
@@ -24,7 +15,7 @@ export default function Hero() {
         </a>
       </div>
 
-      <div className="hero__scroll">scroll ↓</div>
+      <div className="hero__scroll">scroll to morph ↓</div>
     </section>
   );
 }
