@@ -4,13 +4,13 @@
  */
 
 export const site = {
-  brand: "◆ QC",
+  brand: "◆ QIN",
   email: "qinchuan@usc.edu",
 
   meta: {
-    title: "Qinchuan — Portfolio",
+    title: "Qinchuan Zhang — Portfolio",
     description:
-      "Personal portfolio — digital experiences at the edge of code and motion.",
+      "Qinchuan (Qin) Zhang — VR & game developer. M.S. Computer Science (Game Development) at USC. Immersive experiences at the edge of virtual and real.",
   },
 
   nav: [
@@ -20,14 +20,14 @@ export const site = {
   ],
 
   hero: {
-    eyebrow: "Designer · Developer",
+    eyebrow: "VR · Game Developer",
     title: (
       <>
-        I build digital
+        I build immersive
         <br />
         experiences at the
         <br />
-        edge of <em>code</em> &amp; <em>motion</em>
+        edge of <em>virtual</em> &amp; <em>real</em>
       </>
     ),
     cta: { label: "View work", href: "#work" },
@@ -38,19 +38,23 @@ export const site = {
     index: "01 — About",
     lead: (
       <>
-        I design and build interfaces that feel considered, fast, and a little
-        unexpected — somewhere between an agency reel and an engineer&apos;s
-        attention to detail.
+        I&apos;m Qin — an M.S. Computer Science student at USC specializing in
+        game development, building VR, MR, and game experiences from research
+        prototypes to a national museum floor.
       </>
     ),
     columns: [
       {
         heading: "What I do",
-        body: "Frontend engineering, creative WebGL, motion design, and the messy craft of making the two work together at 60fps.",
+        body: "VR/MR/AR development, gameplay engineering, and HCI research — from Gaussian Splatting and haptics to multiplayer systems that hold up outside the lab.",
       },
       {
         heading: "Tools",
-        body: "React, TypeScript, Three.js / R3F, GSAP, Lenis, and whatever the idea actually needs.",
+        body: "Unity & C#, Gaussian Splatting, OpenXR / Quest / Vision Pro, networking, shaders, and whatever the prototype actually needs.",
+      },
+      {
+        heading: "Background",
+        body: "M.S. CS (Game Development) at USC, 2025–present. B.E. Digital Media & Technology. Previously Unity Developer Intern at Virtual Origin; Technical Planning at JoyCastle.",
       },
     ],
   },
@@ -59,24 +63,22 @@ export const site = {
     index: "02 — Selected work",
     projects: [
       {
-        title: "Project One",
-        tag: "WebGL · 2025",
-        blurb: "A particle-driven product launch page.",
+        title: "SyncScape",
+        tag: "Gaussian Splat · HCI · 2026",
+        blurb:
+          "Research on aligning virtual and real spaces in VR using Gaussian Splatting.",
       },
       {
-        title: "Project Two",
-        tag: "React · 2025",
-        blurb: "Design system and marketing site rebuild.",
+        title: "MR Exhibition — National Museum of China",
+        tag: "Mixed Reality · 2025",
+        blurb:
+          "Mixed-reality exhibition experience deployed on the museum floor.",
       },
       {
-        title: "Project Three",
-        tag: "Motion · 2024",
-        blurb: "Scroll-narrative case study experience.",
-      },
-      {
-        title: "Project Four",
-        tag: "Creative · 2024",
-        blurb: "Interactive identity for a studio.",
+        title: "HandSpeaker",
+        tag: "HCI · ML · Hardware · XR",
+        blurb:
+          "Research combining machine learning and custom hardware for hand-based communication in XR.",
       },
     ],
   },
