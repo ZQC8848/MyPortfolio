@@ -178,6 +178,15 @@ em {
   max-width: 18ch;
 }
 
+/* Credentials line under the lead statement — small, muted, one idea per
+   layer: the lead carries the manifesto, this carries the résumé facts. */
+.about__sub {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
 .about__cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

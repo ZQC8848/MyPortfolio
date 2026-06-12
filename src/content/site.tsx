@@ -281,13 +281,11 @@ export const site = {
     index: "01 — About",
     lead: (
       <>
-        I&apos;m Qin — an M.S. Computer Science student at USC and Research
-        Assistant at the Ganek Immersive Studio (USC School of Cinematic
-        Arts), where I also collaborate with Dolby on volumetric video
-        playback. I build human-centered immersive systems where XR, AI, and
-        game design meet.
+        I build human-centered immersive systems where XR, AI, and game
+        design meet.
       </>
     ),
+    sub: "I'm Qin — M.S. Computer Science at USC · Research Assistant at Ganek Immersive Studio, USC School of Cinematic Arts",
     columns: [
       {
         heading: "XR",

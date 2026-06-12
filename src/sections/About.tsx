@@ -6,6 +6,7 @@ export default function About() {
     <section className="section about" id="about">
       <p className="section__index">{about.index}</p>
       <h2 className="section__lead">{about.lead}</h2>
+      <p className="about__sub">{about.sub}</p>
       <div className="about__cols">
         {about.columns.map((col) => (
           <div key={col.heading}>
