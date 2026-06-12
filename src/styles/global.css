@@ -270,6 +270,9 @@ em {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  /* Fill the (grid-equalized) card height so the tag can sink to the
+     bottom — tags then sit on one shared baseline across the row. */
+  flex: 1;
   padding: 1.25rem 1.4rem 1.5rem;
 }
 .card__title {
@@ -282,7 +285,8 @@ em {
   line-height: 1.45;
 }
 .card__tag {
-  margin-top: 0.5rem;
+  margin-top: auto; /* pin to the card bottom regardless of blurb length */
+  padding-top: 0.5rem;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
