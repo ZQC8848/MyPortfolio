@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- The site's diamond brand mark, in the particle gradient colors. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ea8fe" />
+      <stop offset="1" stop-color="#c084fc" />
+    </linearGradient>
+  </defs>
+  <rect x="21" y="21" width="58" height="58" rx="10" fill="url(#g)" transform="rotate(45 50 50)" />
+</svg>
