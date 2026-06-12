@@ -942,8 +942,12 @@ export const site = {
     index: "02 — Selected work",
   },
 
+  archive: {
+    index: "03 — Archive",
+  },
+
   contact: {
-    index: "03 — Contact",
+    index: "04 — Contact",
     lead: (
       <>
         Let&apos;s build

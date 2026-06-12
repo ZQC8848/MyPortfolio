@@ -300,10 +300,7 @@ em {
   color: var(--muted);
 }
 
-/* Archive: the non-featured long tail as compact text rows. */
-.work__archive {
-  margin-top: 3.5rem;
-}
+/* Archive: its own section — the non-featured long tail as compact rows. */
 .archive {
   list-style: none;
   margin: 2.5rem 0 0;

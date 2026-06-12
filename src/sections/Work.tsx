@@ -1,16 +1,10 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { projects, site } from "../content/site";
 
-/**
- * Two tiers: featured projects render as full cards ("Selected Work"),
- * everything else lives in a compact archive list, collapsed by default.
- * The toggle sits above the list, so collapsing never strands the reader.
- */
+/** "Selected Work": the featured projects, as full cards. The rest live in
+ *  the separate Archive section below. */
 export default function Work() {
-  const [archiveOpen, setArchiveOpen] = useState(false);
   const featured = projects.filter((p) => p.featured);
-  const archive = projects.filter((p) => !p.featured);
 
   return (
     <section className="section work" id="work">
@@ -34,30 +28,6 @@ export default function Work() {
             </div>
           </Link>
         ))}
-      </div>
-
-      <div className="work__archive">
-        <button
-          className="work__toggle"
-          aria-expanded={archiveOpen}
-          onClick={() => setArchiveOpen((v) => !v)}
-        >
-          {archiveOpen
-            ? "Hide archive ↑"
-            : `View archive (${archive.length}) ↓`}
-        </button>
-        {archiveOpen && (
-          <ul className="archive">
-            {archive.map((p) => (
-              <li key={p.slug}>
-                <Link className="archive__row" to={`/project/${p.slug}`}>
-                  <span className="archive__title">{p.title}</span>
-                  <span className="archive__tag">{p.tag}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </section>
   );
