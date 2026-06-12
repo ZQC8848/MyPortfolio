@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { projects, site } from "../content/site";
 import { MOBILE_BREAKPOINT } from "../config";
+import { useLenis } from "../lib/ScrollContext";
 
 /** Cards shown while the grid is collapsed. */
 const PREVIEW_DESKTOP = 6;
@@ -24,8 +25,27 @@ function useIsMobile() {
 
 export default function Work() {
   const [expanded, setExpanded] = useState(false);
+  const lenisRef = useLenis();
   const preview = useIsMobile() ? PREVIEW_MOBILE : PREVIEW_DESKTOP;
   const visible = expanded ? projects : projects.slice(0, preview);
+
+  const toggle = () => {
+    if (!expanded) {
+      setExpanded(true);
+      return;
+    }
+    // Collapsing removes most of the grid under the reader's feet — bring
+    // them back to the top of the section instead of stranding them at
+    // whatever now occupies that scroll position. The section's own top
+    // doesn't move, so scrolling before the re-render lands correctly.
+    setExpanded(false);
+    const el = document.querySelector("#work");
+    const lenis = lenisRef.current;
+    if (el) {
+      if (lenis) lenis.scrollTo(el as HTMLElement);
+      else el.scrollIntoView();
+    }
+  };
 
   return (
     <section className="section work" id="work">
@@ -54,7 +74,7 @@ export default function Work() {
         <button
           className="work__toggle"
           aria-expanded={expanded}
-          onClick={() => setExpanded((v) => !v)}
+          onClick={toggle}
         >
           {expanded
             ? "Show fewer ↑"
