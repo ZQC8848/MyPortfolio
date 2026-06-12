@@ -3,14 +3,18 @@
  * Tweak values in this file only — components read, never define, them.
  */
 
-/** OBJ models available as morph targets (served from /public).
- *  Paths must be absolute — relative paths break on nested routes
- *  like /project/:slug. */
+/**
+ * Pre-baked point banks available as morph targets (served from /public).
+ * Each .bin is a raw Float32Array of xyz triplets sampled offline from the
+ * source OBJ in assets-src/models/ — run `npm run bake` after changing a
+ * model there. Paths must be absolute — relative paths break on nested
+ * routes like /project/:slug.
+ */
 export const MODELS = {
-  quest3: "/models/meta_quest_3.obj",
-  david: "/models/David.obj",
-  fightOn: "/models/FightOn.obj",
-  rocket: "/models/rocket.obj",
+  quest3: "/points/meta_quest_3.bin",
+  david: "/points/David.bin",
+  fightOn: "/points/FightOn.bin",
+  rocket: "/points/rocket.bin",
 } as const;
 
 export type ShapeName = keyof typeof MODELS | "explode";

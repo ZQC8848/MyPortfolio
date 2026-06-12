@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import {
   AMBIENT_PARTICLES,
   CAMERA,
@@ -17,10 +16,11 @@ import {
 import { useScrollProgress } from "../lib/ScrollContext";
 import { particleFragmentShader, particleVertexShader } from "./shaders";
 import {
+  PointBankLoader,
   applyKeyframeScale,
+  bankToShape,
   explodePositions,
   keyframeQuaternion,
-  shapeFromObj,
 } from "./sampling";
 
 const MODEL_KEYS = Object.keys(MODELS) as (keyof typeof MODELS)[];
@@ -225,7 +225,7 @@ function Particles({ routeKey }: { routeKey: string }) {
   const count = useMemo(() => getParticleCount(), []);
   const timeline = useRef<Timeline | null>(null);
 
-  const loaded = useLoader(OBJLoader, MODEL_PATHS);
+  const loaded = useLoader(PointBankLoader, MODEL_PATHS);
 
   // Measure anchored keyframes against the live layout, and re-measure when
   // the route, the viewport, or the document height changes (resize, images
@@ -251,7 +251,7 @@ function Particles({ routeKey }: { routeKey: string }) {
       explode: explodePositions(count),
     };
     MODEL_KEYS.forEach((key, i) => {
-      bank[key] = shapeFromObj(loaded[i], count);
+      bank[key] = bankToShape(loaded[i], count);
     });
     // Bake per-keyframe scale into the banks; rotation and position offsets
     // are interpolated per-frame at the group level in useFrame, so they stay

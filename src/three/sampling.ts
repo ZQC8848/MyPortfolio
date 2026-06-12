@@ -1,99 +1,51 @@
 import * as THREE from "three";
-import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
 import { PARTICLES, type ShapeKeyframe } from "../config";
 
-/** Scale a geometry so its largest dimension equals `targetSize`, centered at origin. */
-export function normalizeGeometry(
-  geometry: THREE.BufferGeometry,
-  targetSize: number = PARTICLES.modelSize
-): void {
-  geometry.computeBoundingBox();
-  const size = new THREE.Vector3();
-  geometry.boundingBox!.getSize(size);
-  const maxDim = Math.max(size.x, size.y, size.z);
-  if (maxDim > 0) {
-    const s = targetSize / maxDim;
-    geometry.scale(s, s, s);
+/**
+ * Loads a pre-baked point bank: a raw Float32Array of xyz triplets,
+ * unit-sized and centered, produced offline by scripts/bake-points.mjs.
+ * Sampling the multi-megabyte OBJs happens at bake time, not in the
+ * browser — the .bin files are ~200KB each.
+ */
+export class PointBankLoader extends THREE.Loader<Float32Array> {
+  load(
+    url: string,
+    onLoad: (bank: Float32Array) => void,
+    onProgress?: (event: ProgressEvent) => void,
+    onError?: (err: unknown) => void
+  ): void {
+    const loader = new THREE.FileLoader(this.manager);
+    loader.setResponseType("arraybuffer");
+    loader.setPath(this.path);
+    loader.load(
+      url,
+      (buffer) => onLoad(new Float32Array(buffer as ArrayBuffer)),
+      onProgress,
+      onError
+    );
   }
-  geometry.center();
-}
-
-/** Sample `count` points uniformly off a mesh surface. */
-function sampleSurface(mesh: THREE.Mesh, count: number): Float32Array {
-  const sampler = new MeshSurfaceSampler(mesh).build();
-  const out = new Float32Array(count * 3);
-  const tmp = new THREE.Vector3();
-  for (let i = 0; i < count; i++) {
-    sampler.sample(tmp);
-    out.set([tmp.x, tmp.y, tmp.z], i * 3);
-  }
-  return out;
-}
-
-/** Pick `count` vertices from a position attribute (point-cloud OBJs have no faces). */
-function sampleVertices(
-  position: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
-  count: number
-): Float32Array {
-  const total = position.count;
-  const out = new Float32Array(count * 3);
-  if (count <= total) {
-    // Partial Fisher–Yates: even coverage without duplicate points.
-    const idx = new Uint32Array(total);
-    for (let i = 0; i < total; i++) idx[i] = i;
-    for (let i = 0; i < count; i++) {
-      const j = i + Math.floor(Math.random() * (total - i));
-      const t = idx[i];
-      idx[i] = idx[j];
-      idx[j] = t;
-      const k = idx[i];
-      out[i * 3] = position.getX(k);
-      out[i * 3 + 1] = position.getY(k);
-      out[i * 3 + 2] = position.getZ(k);
-    }
-  } else {
-    // Fewer vertices than particles: reuse vertices (stacked points are invisible
-    // under additive blending at this density).
-    for (let i = 0; i < count; i++) {
-      const k = i % total;
-      out[i * 3] = position.getX(k);
-      out[i * 3 + 1] = position.getY(k);
-      out[i * 3 + 2] = position.getZ(k);
-    }
-  }
-  return out;
 }
 
 /**
- * Turn a loaded OBJ into `count` normalized particle positions.
- * Meshes (OBJs with faces) get uniform surface sampling; face-less OBJs load
- * as THREE.Points / THREE.LineSegments and have their vertices sampled directly.
+ * Expand a unit-sized bank to `count` particle positions at world scale.
+ * Banks are stored in random order, so taking the first `count` points is a
+ * uniform subsample; if `count` exceeds the bank, points repeat (stacked
+ * points are invisible under additive blending at this density).
  */
-export function shapeFromObj(obj: THREE.Object3D, count: number): Float32Array {
-  let mesh: THREE.Mesh | null = null;
-  let cloud: THREE.BufferGeometry | null = null;
-  obj.traverse((c) => {
-    if ((c as THREE.Mesh).isMesh && !mesh) {
-      mesh = c as THREE.Mesh;
-    } else if (
-      ((c as THREE.Points).isPoints || (c as THREE.LineSegments).isLineSegments) &&
-      !cloud
-    ) {
-      cloud = (c as THREE.Points).geometry;
-    }
-  });
-
-  if (mesh) {
-    const m = mesh as THREE.Mesh;
-    normalizeGeometry(m.geometry);
-    return sampleSurface(m, count);
+export function bankToShape(
+  src: Float32Array,
+  count: number,
+  size: number = PARTICLES.modelSize
+): Float32Array {
+  const total = Math.floor(src.length / 3);
+  const out = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const k = (i % total) * 3;
+    out[i * 3] = src[k] * size;
+    out[i * 3 + 1] = src[k + 1] * size;
+    out[i * 3 + 2] = src[k + 2] * size;
   }
-  if (cloud) {
-    const geo = cloud as THREE.BufferGeometry;
-    normalizeGeometry(geo);
-    return sampleVertices(geo.attributes.position, count);
-  }
-  throw new Error("OBJ contains no usable geometry (no mesh, points, or lines)");
+  return out;
 }
 
 /**

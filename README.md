@@ -51,7 +51,9 @@ src/
 │  └─ shaders.ts              # 粒子的 vertex / fragment GLSL
 └─ styles/global.css      # 全部样式(BEM 命名,含响应式断点)
 
-public/models/            # meta_quest_3 · David · FightOn · rocket(形变目标 .obj)
+assets-src/models/        # 模型源文件 .obj(不随站点分发,仅离线采样用)
+scripts/bake-points.mjs   # npm run bake:OBJ → 预采样点云 public/points/*.bin
+public/points/            # 每模型 ~188KB 的 Float32Array 点坐标(站点实际加载)
 .github/workflows/ci.yml  # push/PR 自动跑 lint + build
 ```
 
@@ -68,7 +70,7 @@ public/models/            # meta_quest_3 · David · FightOn · rocket(形变目
 | 形状成形后停留多久再继续形变 | `SHAPE_KEYFRAMES` 条目的 `hold`(占总滚动的比例,如 0.1 = 停留 10%) |
 | 项目详情页背景 | 自动回退为 explode 星散(页面缺少锚点区块时的统一行为) |
 | 单个形状的旋转/位置/大小微调 | `SHAPE_KEYFRAMES` 条目的 `rotateAxis`+`rotateAngle` / `offset` / `scale` |
-| 新增形变模型 | `public/models/` 放 .obj → `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_KEYFRAMES`(有面网格和纯点云 .obj 都支持) |
+| 新增形变模型 | `assets-src/models/` 放 .obj → `npm run bake`(离线采样出 `public/points/*.bin`)→ `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_KEYFRAMES`(有面网格和纯点云 .obj 都支持) |
 | 相机距离/视角、竖屏适配强度 | `src/config.ts` → `CAMERA` |
 | 移动端粒子数/DPR | `src/config.ts` → `countMobile` / `getDprRange` |
 | 粒子外观(光点形状、渐变) | `src/three/shaders.ts` |
@@ -93,7 +95,7 @@ Particles.useFrame: damp 阻尼追踪 → 按 SHAPE_KEYFRAMES.at 定位所在区
 
 关键实现点:
 
-1. **点云生成**(`three/sampling.ts`):`OBJLoader` 加载模型 → `normalizeMesh` 统一缩放居中 → `MeshSurfaceSampler` 表面均匀采样 N 点 → `Float32Array`。`explode` 形状是程序生成的随机散布。
+1. **点云离线预采样**(`scripts/bake-points.mjs`):OBJ 的加载/归一化/表面采样在构建期完成,产物是单位尺寸的 `Float32Array` 点坐标(`public/points/*.bin`,每个 ~188KB)。浏览器只 fetch 二进制点坐标(`three/sampling.ts` 的 `PointBankLoader`),按 `modelSize` 缩放即用 —— 相比直接加载 30MB 的 OBJ,4G 下点云出现时间从 ~26s 降到 ~2s,且无主线程解析卡顿。`explode` 形状是程序生成的随机散布。
 2. **滚动进度走 ref 而非 state**:`progress` 是 `RefObject<number>`,每帧在 `useFrame` 里读 `.current`,完全绕开 React 渲染循环 —— 滚动再快也不会触发重渲染。
 3. **空闲早退**:滚动静止时(进度变化 < 1e-4)跳过缓冲写入与上传,空闲时 CPU 开销≈0。
 4. **响应式相机**(`ResponsiveCamera`):竖屏时按宽高比把相机拉远(`CAMERA.fitWidth / aspect`),保证模型横向完整入框。

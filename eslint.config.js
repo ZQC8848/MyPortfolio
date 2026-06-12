@@ -28,5 +28,12 @@ export default tseslint.config(
       "react-hooks/purity": "off",
       "react-hooks/immutability": "off",
     },
+  },
+  {
+    // Offline build tooling (e.g. the point-cloud baker) runs under Node.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: globals.node,
+    },
   }
 );
