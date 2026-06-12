@@ -661,11 +661,12 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "chinese-abats-vr-teaching",
-    title: "Chinese Abats VR Teaching",
+    slug: "chinese-abacus-vr-teaching",
+    title: "Chinese Abacus VR Teaching",
     tag: "VR · Education · 2024",
-    blurb: "A VR teaching experience for traditional Chinese craft.",
-    cover: "/projects/chinese-abats-vr-teaching.png",
+    blurb:
+      "A VR teaching experience for the traditional Chinese abacus (suanpan).",
+    cover: "/projects/chinese-abacus-vr-teaching.png",
     video: { type: "youtube", id: "xO3TpVAirQM" },
     meta: [
       { label: "Type", value: "VR · Education" },
@@ -676,8 +677,8 @@ export const projects: Project[] = [
         heading: "Overview",
         body: (
           <>
-            A VR teaching experience built around traditional Chinese
-            culture. Demo in the video; full write-up is in progress.
+            A VR experience teaching the traditional Chinese abacus
+            (suanpan). Demo in the video; full write-up is in progress.
           </>
         ),
       },

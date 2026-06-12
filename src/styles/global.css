@@ -300,6 +300,27 @@ em {
   color: var(--muted);
 }
 
+/* Expand/collapse pill under the grid — same language as the hero CTA. */
+.work__toggle {
+  display: block;
+  margin: 2.5rem auto 0;
+  padding: 0.85rem 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: none;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+.work__toggle:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
 /* ---------- Project detail page ---------- */
 .project {
   max-width: 880px;

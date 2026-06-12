@@ -1,12 +1,37 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { projects, site } from "../content/site";
+import { MOBILE_BREAKPOINT } from "../config";
+
+/** Cards shown while the grid is collapsed. */
+const PREVIEW_DESKTOP = 6;
+const PREVIEW_MOBILE = 3;
+
+/** Live (listener-backed) version of the 768px breakpoint check. */
+function useIsMobile() {
+  const query = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
+  const [mobile, setMobile] = useState(
+    () => window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [query]);
+  return mobile;
+}
 
 export default function Work() {
+  const [expanded, setExpanded] = useState(false);
+  const preview = useIsMobile() ? PREVIEW_MOBILE : PREVIEW_DESKTOP;
+  const visible = expanded ? projects : projects.slice(0, preview);
+
   return (
     <section className="section work" id="work">
       <p className="section__index">{site.work.index}</p>
       <div className="work__grid">
-        {projects.map((p, i) => (
+        {visible.map((p, i) => (
           <Link className="card" to={`/project/${p.slug}`} key={p.slug}>
             <div className="card__media">
               {p.cover ? (
@@ -25,6 +50,17 @@ export default function Work() {
           </Link>
         ))}
       </div>
+      {projects.length > preview && (
+        <button
+          className="work__toggle"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded
+            ? "Show fewer ↑"
+            : `View all ${projects.length} projects ↓`}
+        </button>
+      )}
     </section>
   );
 }
