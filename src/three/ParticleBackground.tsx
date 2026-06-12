@@ -24,123 +24,49 @@ import {
   explodePositions,
   keyframeQuaternion,
 } from "./sampling";
+import { resolveTimeline, type Timeline } from "./timeline";
 
 const MODEL_KEYS = Object.keys(MODELS) as (keyof typeof MODELS)[];
 const MODEL_PATHS = MODEL_KEYS.map((k) => MODELS[k]);
 
-type Vec3 = readonly [number, number, number];
-
-/** One point on the resolved timeline: progress `at` shows keyframe `kf`. */
-interface TimelineStop {
-  at: number;
-  kf: number;
-}
-interface Timeline {
-  stops: TimelineStop[];
-  offsets: Vec3[];
-}
-
-/**
- * Resolve the morph timeline for the CURRENT layout. Each keyframe becomes
- * an [enter, exit] pair — the shape is fully formed at `enter` and starts
- * dissolving at `exit = enter + hold`. Anchored keyframes measure `enter`
- * from their element's real document position (correct on any viewport
- * width); unanchored ones are spaced into the surrounding gaps. If any
- * anchored element is missing (e.g. on /project/:slug), the page doesn't
- * have the sections this timeline is choreographed around, so the
- * background falls back to a static explode scatter.
- */
-function resolveTimeline(): Timeline {
-  const kfs = SHAPE_KEYFRAMES;
-  const n = kfs.length;
-  const mobile = isMobileViewport();
-  const offsets = kfs.map<Vec3>(
-    (kf) => (mobile ? kf.offsetMobile ?? kf.offset : kf.offset) ?? [0, 0, 0]
-  );
-  const hold = (i: number) => kfs[i].hold ?? 0;
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-
-  const enter: (number | null)[] = new Array(n).fill(null);
-  const exit: (number | null)[] = new Array(n).fill(null);
-  for (let i = 0; i < n; i++) {
-    const sel = kfs[i].anchor;
-    if (!sel) continue;
-    const el = document.querySelector(sel);
-    if (!el || maxScroll <= 0) {
-      const e = Math.max(kfs.findIndex((k) => k.shape === "explode"), 0);
-      return {
-        stops: [
-          { at: 0, kf: e },
-          { at: 1, kf: e },
-        ],
-        offsets,
-      };
-    }
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const target = top - (kfs[i].anchorViewport ?? 0.1) * window.innerHeight;
-    enter[i] = THREE.MathUtils.clamp(target / maxScroll, 0, 1);
-    exit[i] = enter[i]! + hold(i);
-  }
-
-  // Unanchored endpoints hold at the page edges.
-  if (enter[0] === null) {
-    enter[0] = 0;
-    exit[0] = hold(0);
-  }
-  if (enter[n - 1] === null) {
-    exit[n - 1] = 1;
-    enter[n - 1] = 1 - hold(n - 1);
-  }
-  // Unanchored middles: split the gap between the surrounding resolved
-  // keyframes into equal morph transitions, reserving room for holds.
-  for (let i = 1; i < n - 1; i++) {
-    if (enter[i] !== null) continue;
-    let j = i + 1;
-    while (enter[j] === null) j++;
-    let holdSum = 0;
-    for (let k = i; k < j; k++) holdSum += hold(k);
-    const gap = enter[j]! - exit[i - 1]!;
-    const morph = Math.max(gap - holdSum, 0) / (j - i + 1);
-    let cursor = exit[i - 1]!;
-    for (let k = i; k < j; k++) {
-      enter[k] = cursor + morph;
-      exit[k] = enter[k]! + hold(k);
-      cursor = exit[k]!;
-    }
-  }
-
-  // Flatten to a non-decreasing stop list (anchors can land out of order).
-  const stops: TimelineStop[] = [];
-  let prev = 0;
-  for (let i = 0; i < n; i++) {
-    const e0 = Math.max(enter[i]!, prev);
-    const e1 = Math.max(exit[i]!, e0);
-    stops.push({ at: e0, kf: i }, { at: e1, kf: i });
-    prev = e1;
-  }
-  return { stops, offsets };
-}
-
 /**
  * Normalized pointer position (-1..1, +y up), tracked on window because the
- * canvas itself is pointer-events: none. Stays null until the pointer first
- * moves, and never activates on touch / reduced-motion — so the effects it
- * drives are simply inert there.
+ * canvas itself is pointer-events: none. Module-level singleton: one
+ * listener feeds every consumer (camera sway, repulsion ray). null until
+ * the pointer first moves and again whenever it leaves the window, and
+ * never activates on touch / reduced-motion — so the effects it drives are
+ * simply inert there.
  */
+const pointerNDC: { current: THREE.Vector2 | null } = { current: null };
+let pointerUsers = 0;
+
+const onPointerMove = (e: PointerEvent) => {
+  (pointerNDC.current ??= new THREE.Vector2()).set(
+    (e.clientX / window.innerWidth) * 2 - 1,
+    -(e.clientY / window.innerHeight) * 2 + 1
+  );
+};
+const onPointerGone = () => {
+  pointerNDC.current = null;
+};
+
 function useWindowPointer() {
-  const pointer = useRef<THREE.Vector2 | null>(null);
   useEffect(() => {
     if (!isHoverPointer() || prefersReducedMotion()) return;
-    const onMove = (e: PointerEvent) => {
-      (pointer.current ??= new THREE.Vector2()).set(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
-      );
+    if (pointerUsers++ === 0) {
+      window.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerleave", onPointerGone);
+      window.addEventListener("blur", onPointerGone);
+    }
+    return () => {
+      if (--pointerUsers === 0) {
+        window.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerleave", onPointerGone);
+        window.removeEventListener("blur", onPointerGone);
+      }
     };
-    window.addEventListener("pointermove", onMove);
-    return () => window.removeEventListener("pointermove", onMove);
   }, []);
-  return pointer;
+  return pointerNDC;
 }
 
 /**
@@ -188,6 +114,32 @@ function ResponsiveCamera() {
 const MOUSE_PARKED = new THREE.Vector3(1e6, 1e6, 1e6);
 
 /**
+ * Repulsion-ray uniform values, shared by reference: every particle
+ * material points its uRayOrigin/uRayDir at these vectors, so PointerRay's
+ * single raycast per frame drives any number of clouds.
+ */
+const sharedRay = {
+  origin: MOUSE_PARKED.clone(),
+  dir: new THREE.Vector3(0, 0, -1),
+};
+
+/** Casts the camera→cursor ray; parks the field when the pointer leaves. */
+function PointerRay() {
+  const pointer = useWindowPointer();
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  useFrame((state) => {
+    if (pointer.current) {
+      raycaster.setFromCamera(pointer.current, state.camera);
+      sharedRay.origin.copy(raycaster.ray.origin);
+      sharedRay.dir.copy(raycaster.ray.direction);
+    } else {
+      sharedRay.origin.copy(MOUSE_PARKED);
+    }
+  });
+  return null;
+}
+
+/**
  * Sparse, never-morphing explode scatter behind the main cloud — a cheap
  * depth layer for the home page. Same shader, fewer/wider/smaller points.
  * It spins from both time and scroll, around an axis that slowly precesses
@@ -195,9 +147,7 @@ const MOUSE_PARKED = new THREE.Vector3(1e6, 1e6, 1e6);
  */
 function AmbientScatter() {
   const scroll = useScrollProgress();
-  const pointer = useWindowPointer();
   const pointsRef = useRef<THREE.Points>(null!);
-  const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const spin = useRef(0);
   const precession = useRef(0);
   const axis = useRef(new THREE.Vector3(0, 1, 0));
@@ -226,11 +176,11 @@ function AmbientScatter() {
     const u = {
       uSize: { value: AMBIENT_PARTICLES.size },
       uSizeRange: { value: new THREE.Vector2(...PARTICLES.sizeRange) },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      uPixelRatio: { value: 1 }, // synced per-frame to the real renderer DPR
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
-      uRayOrigin: { value: MOUSE_PARKED.clone() },
-      uRayDir: { value: new THREE.Vector3(0, 0, -1) },
+      uRayOrigin: { value: sharedRay.origin },
+      uRayDir: { value: sharedRay.dir },
       uMouseRadius: { value: POINTER_FX.repelRadius },
       uMouseStrength: { value: POINTER_FX.repelStrength },
       uTime: { value: 0 },
@@ -239,13 +189,8 @@ function AmbientScatter() {
   }, [count]);
 
   useFrame((state, delta) => {
-    // The backdrop reacts to the pointer too — same camera→cursor ray.
     uniforms.uTime.value += delta;
-    if (pointer.current) {
-      raycaster.setFromCamera(pointer.current, state.camera);
-      uniforms.uRayOrigin.value.copy(raycaster.ray.origin);
-      uniforms.uRayDir.value.copy(raycaster.ray.direction);
-    }
+    uniforms.uPixelRatio.value = state.viewport.dpr;
 
     if (reducedMotion) return;
     // Idle counter-spin plus a scroll-coupled term; the spin axis itself
@@ -281,10 +226,8 @@ function AmbientScatter() {
 
 function Particles({ routeKey }: { routeKey: string }) {
   const scroll = useScrollProgress();
-  const pointer = useWindowPointer();
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
-  const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const swingTime = useRef(0);
   const spin = useRef(0);
   const progress = useRef(0);
@@ -333,10 +276,10 @@ function Particles({ routeKey }: { routeKey: string }) {
     for (let i = 0; i < count; i++) randoms[i] = Math.random();
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(seq[0]), 3)
-    );
+    const posAttr = new THREE.BufferAttribute(new Float32Array(seq[0]), 3);
+    // Rewritten on every morph frame — tell the driver up front.
+    posAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute("position", posAttr);
     geo.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
 
     const u = {
@@ -344,11 +287,11 @@ function Particles({ routeKey }: { routeKey: string }) {
       uSizeRange: {
         value: new THREE.Vector2(...PARTICLES.sizeRange),
       },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      uPixelRatio: { value: 1 }, // synced per-frame to the real renderer DPR
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
-      uRayOrigin: { value: MOUSE_PARKED.clone() },
-      uRayDir: { value: new THREE.Vector3(0, 0, -1) },
+      uRayOrigin: { value: sharedRay.origin },
+      uRayDir: { value: sharedRay.dir },
       uMouseRadius: { value: POINTER_FX.repelRadius },
       uMouseStrength: { value: POINTER_FX.repelStrength },
       uTime: { value: 0 },
@@ -360,15 +303,11 @@ function Particles({ routeKey }: { routeKey: string }) {
     if (!timeline.current) return;
     const { stops, offsets } = timeline.current;
 
-    // Pointer repulsion: hand the camera→cursor ray to the vertex shader.
-    // Runs before the scroll early-out because hovering must work while
-    // the page is still.
+    // Per-frame uniforms, before the scroll early-out (hovering and DPR
+    // changes must apply while the page is still). The repulsion ray
+    // vectors are shared by reference — PointerRay already updated them.
     uniforms.uTime.value += delta;
-    if (pointer.current) {
-      raycaster.setFromCamera(pointer.current, state.camera);
-      uniforms.uRayOrigin.value.copy(raycaster.ray.origin);
-      uniforms.uRayDir.value.copy(raycaster.ray.direction);
-    }
+    uniforms.uPixelRatio.value = state.viewport.dpr;
 
     // Chase the scroll position (instantly under reduced motion).
     progress.current = reducedMotion
@@ -487,6 +426,7 @@ export default function ParticleBackground() {
         }}
       >
         <ResponsiveCamera />
+        <PointerRay />
         <Particles routeKey={pathname} />
         {pathname === "/" && <AmbientScatter />}
       </Canvas>

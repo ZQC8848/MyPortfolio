@@ -19,7 +19,33 @@ export class PointBankLoader extends THREE.Loader<Float32Array> {
     loader.setPath(this.path);
     loader.load(
       url,
-      (buffer) => onLoad(new Float32Array(buffer as ArrayBuffer)),
+      (buffer) => {
+        // Guard against silent garbage: an SPA fallback serves index.html
+        // with HTTP 200 for a missing .bin, and HTML bytes would "parse"
+        // into a Float32Array just fine. Banks are unit-sized (|coord| ≲
+        // 0.5), so real data is cheap to verify.
+        const buf = buffer as ArrayBuffer;
+        let valid = buf.byteLength > 0 && buf.byteLength % 12 === 0;
+        if (valid) {
+          const arr = new Float32Array(buf);
+          for (let i = 0; i < arr.length; i++) {
+            if (!Number.isFinite(arr[i]) || Math.abs(arr[i]) > 4) {
+              valid = false;
+              break;
+            }
+          }
+          if (valid) {
+            onLoad(arr);
+            return;
+          }
+        }
+        onError?.(
+          new Error(
+            `PointBankLoader: "${url}" is not a point bank (${buf.byteLength} bytes) — ` +
+              `missing file served as HTML by an SPA fallback? Check the path in MODELS and re-run \`npm run bake\`.`
+          )
+        );
+      },
       onProgress,
       onError
     );
@@ -69,10 +95,19 @@ export function applyKeyframeScale(
 /** Keyframe rotation offset as a quaternion (identity when unset). */
 export function keyframeQuaternion(kf: ShapeKeyframe): THREE.Quaternion {
   const q = new THREE.Quaternion();
-  if (kf.rotateAxis && kf.rotateAngle) {
+  const hasAxis = kf.rotateAxis !== undefined;
+  const hasAngle = kf.rotateAngle !== undefined;
+  // config.ts is a hand-edited DSL — half a rotation is a typo, not intent.
+  if (hasAxis !== hasAngle) {
+    console.warn(
+      `[particles] keyframe "${kf.shape}": rotateAxis and rotateAngle must be set together — rotation ignored`
+    );
+    return q;
+  }
+  if (hasAxis && hasAngle) {
     q.setFromAxisAngle(
-      new THREE.Vector3(...kf.rotateAxis).normalize(),
-      kf.rotateAngle
+      new THREE.Vector3(...kf.rotateAxis!).normalize(),
+      kf.rotateAngle!
     );
   }
   return q;

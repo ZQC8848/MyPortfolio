@@ -11,7 +11,9 @@ const ParticleBackground = lazy(() => import("./three/ParticleBackground"));
 
 /** Scrolls to top on route change, or to the anchor when a hash is present. */
 function ScrollManager() {
-  const { pathname, hash } = useLocation();
+  // `key` changes on EVERY navigation, so clicking the same anchor twice
+  // still re-scrolls (pathname/hash alone would be unchanged → no effect).
+  const { pathname, hash, key } = useLocation();
   const lenisRef = useLenis();
 
   useEffect(() => {
@@ -26,7 +28,7 @@ function ScrollManager() {
     }
     if (lenis) lenis.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);
-  }, [pathname, hash, lenisRef]);
+  }, [pathname, hash, key, lenisRef]);
 
   return null;
 }
