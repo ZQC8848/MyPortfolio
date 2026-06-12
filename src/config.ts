@@ -17,9 +17,9 @@ export type ShapeName = keyof typeof MODELS | "explode";
 
 /** Shapes the cloud morphs through, top of page → bottom. */
 export const SHAPE_SEQUENCE: readonly ShapeName[] = [
-  "quest3",
-  "explode",
   "david",
+  "explode",
+  "quest3",
   "explode",
   "fightOn",
   "explode",
@@ -54,7 +54,7 @@ export const CAMERA = {
   fov: 45,
   height: 4,
   /** Default camera distance (landscape). */
-  distance: 60,
+  distance: 30,
   /**
    * Minimum world-units of horizontal width the camera must frame; on
    * narrow/portrait screens the camera pulls back so the model still fits.

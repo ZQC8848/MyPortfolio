@@ -13,12 +13,7 @@ import {
 } from "../config";
 import { useScrollProgress } from "../lib/ScrollContext";
 import { particleFragmentShader, particleVertexShader } from "./shaders";
-import {
-  explodePositions,
-  firstMesh,
-  normalizeMesh,
-  samplePoints,
-} from "./sampling";
+import { explodePositions, shapeFromObj } from "./sampling";
 
 const MODEL_KEYS = Object.keys(MODELS) as (keyof typeof MODELS)[];
 const MODEL_PATHS = MODEL_KEYS.map((k) => MODELS[k]);
@@ -57,9 +52,7 @@ function Particles() {
       explode: explodePositions(count),
     };
     MODEL_KEYS.forEach((key, i) => {
-      const mesh = firstMesh(loaded[i]);
-      normalizeMesh(mesh);
-      bank[key] = samplePoints(mesh, count);
+      bank[key] = shapeFromObj(loaded[i], count);
     });
     const seq = SHAPE_SEQUENCE.map((k) => bank[k]!);
 
