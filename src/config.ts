@@ -110,13 +110,19 @@ export const PARTICLES = {
    */
   swingAmplitude: 0.4,
   /** Seconds for one full back-and-forth swing cycle. */
-  swingPeriod: 8,
+  swingPeriod: 24,
+  /**
+   * The "explode" scatter ignores the swing and keeps a continuous spin
+   * instead (radians/second). The two motions cross-fade during morphs,
+   * and leftover spin unwinds invisibly (mod 2π) as a model re-forms.
+   */
+  explodeRotation: 0.06,
   /**
    * Base Y rotation (radians), the centre of the swing. A 3/4 view reads
    * much better than a head-on one for shapes like the headset, whose
    * front-on silhouette is a low-density blob.
    */
-  initialRotationY: 0.7,
+  initialRotationY: 0.5,
 } as const;
 
 /**

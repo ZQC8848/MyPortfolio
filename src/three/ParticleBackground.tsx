@@ -286,6 +286,7 @@ function Particles({ routeKey }: { routeKey: string }) {
   const pointsRef = useRef<THREE.Points>(null!);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const swingTime = useRef(0);
+  const spin = useRef(0);
   const progress = useRef(0);
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
@@ -369,24 +370,10 @@ function Particles({ routeKey }: { routeKey: string }) {
       uniforms.uRayDir.value.copy(raycaster.ray.direction);
     }
 
-    // Idle motion: a sine swing around the base orientation — eased speed,
-    // never a full revolution. Skipped for reduced motion.
-    if (!reducedMotion) {
-      swingTime.current += delta;
-      pointsRef.current.rotation.y =
-        PARTICLES.initialRotationY +
-        Math.sin((swingTime.current * Math.PI * 2) / PARTICLES.swingPeriod) *
-          PARTICLES.swingAmplitude;
-    }
-
     // Chase the scroll position (instantly under reduced motion).
     progress.current = reducedMotion
       ? scroll.current
       : THREE.MathUtils.damp(progress.current, scroll.current, PARTICLES.damp, delta);
-
-    // Early-out: don't rewrite/re-upload 27k floats while scroll is idle.
-    if (Math.abs(progress.current - lastWritten.current) < 1e-4) return;
-    lastWritten.current = progress.current;
 
     // Find the stop segment containing the current progress (the resolved
     // stops are ascending). Between a keyframe's enter/exit stops both ends
@@ -408,6 +395,34 @@ function Particles({ routeKey }: { routeKey: string }) {
     );
     const k0 = stops[s].kf;
     const k1 = stops[s + 1].kf;
+
+    // Idle motion. Models rock back and forth (eased sine swing, bounded
+    // angle); the explode scatter keeps a continuous spin instead. The two
+    // cross-fade by the segment's explode weight `e`, and leftover spin
+    // unwinds via the shortest path (±2π is the same orientation) so a
+    // model always re-forms at its designed angle. Skipped under reduced
+    // motion.
+    if (!reducedMotion) {
+      const e0 = SHAPE_KEYFRAMES[k0].shape === "explode" ? 1 : 0;
+      const e1 = SHAPE_KEYFRAMES[k1].shape === "explode" ? 1 : 0;
+      const e = e0 + (e1 - e0) * t;
+      swingTime.current += delta;
+      if (e > 0) spin.current += delta * PARTICLES.explodeRotation * e;
+      if (e < 1) {
+        spin.current -= Math.round(spin.current / (2 * Math.PI)) * 2 * Math.PI;
+        spin.current = THREE.MathUtils.damp(spin.current, 0, 4 * (1 - e), delta);
+      }
+      pointsRef.current.rotation.y =
+        PARTICLES.initialRotationY +
+        spin.current +
+        Math.sin((swingTime.current * Math.PI * 2) / PARTICLES.swingPeriod) *
+          PARTICLES.swingAmplitude *
+          (1 - e);
+    }
+
+    // Early-out: don't rewrite/re-upload 45k floats while scroll is idle.
+    if (Math.abs(progress.current - lastWritten.current) < 1e-4) return;
+    lastWritten.current = progress.current;
 
     // Keyframe offsets live on the outer group (screen space): position is
     // lerped, rotation slerped — the inner points' idle spin can't drag them.
