@@ -285,7 +285,7 @@ export const site = {
         design meet.
       </>
     ),
-    sub: "I'm Qin — M.S. Computer Science at USC · Research Assistant at Ganek Immersive Studio, USC School of Cinematic Arts",
+    sub: "M.S. Computer Science at USC · Research Assistant at Ganek Immersive Studio, USC School of Cinematic Arts",
     columns: [
       {
         heading: "XR",
