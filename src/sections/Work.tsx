@@ -1,20 +1,30 @@
-import { site } from "../content/site";
+import { Link } from "react-router-dom";
+import { projects, site } from "../content/site";
 
 export default function Work() {
-  const { work } = site;
   return (
     <section className="section work" id="work">
-      <p className="section__index">{work.index}</p>
-      <ul className="work__list">
-        {work.projects.map((p, i) => (
-          <li className="work__item" key={p.title}>
-            <span className="work__num">{String(i + 1).padStart(2, "0")}</span>
-            <span className="work__title">{p.title}</span>
-            <span className="work__blurb">{p.blurb}</span>
-            <span className="work__tag">{p.tag}</span>
-          </li>
+      <p className="section__index">{site.work.index}</p>
+      <div className="work__grid">
+        {projects.map((p, i) => (
+          <Link className="card" to={`/project/${p.slug}`} key={p.slug}>
+            <div className="card__media">
+              {p.cover ? (
+                <img src={p.cover} alt={p.title} loading="lazy" />
+              ) : (
+                <div className="card__placeholder" aria-hidden>
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                </div>
+              )}
+            </div>
+            <div className="card__body">
+              <h3 className="card__title">{p.title}</h3>
+              <p className="card__blurb">{p.blurb}</p>
+              <span className="card__tag">{p.tag}</span>
+            </div>
+          </Link>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }

@@ -1,16 +1,17 @@
+import { Link } from "react-router-dom";
 import { site } from "../content/site";
 
 export default function Nav() {
   return (
     <header className="nav">
-      <a className="nav__brand" href="#top">
+      <Link className="nav__brand" to="/">
         {site.brand}
-      </a>
+      </Link>
       <nav className="nav__links">
         {site.nav.map((l) => (
-          <a key={l.href} href={l.href}>
+          <Link key={l.href} to={l.href}>
             {l.label}
-          </a>
+          </Link>
         ))}
       </nav>
     </header>

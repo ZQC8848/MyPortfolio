@@ -40,8 +40,11 @@ src/
 ├─ components/
 │  ├─ Nav.tsx             # 顶部导航(mix-blend-mode: difference)
 │  └─ ErrorBoundary.tsx   # 包住 3D 子树,WebGL 挂了不影响正文
+├─ pages/                 # 路由页面(react-router)
+│  ├─ Home.tsx            # /            首页(四个 section)
+│  └─ Project.tsx         # /project/:slug  项目详情(嵌入视频+图文)
 ├─ sections/              # 纯展示组件,内容全部来自 content/site.tsx
-│  ├─ Hero.tsx · About.tsx · Work.tsx · Contact.tsx
+│  ├─ Hero.tsx · About.tsx · Work.tsx(卡片网格)· Contact.tsx
 ├─ three/                 # 命令式 WebGL 层(ESLint purity 规则在此豁免)
 │  ├─ ParticleBackground.tsx  # 编排:Canvas + 响应式相机 + 形变循环
 │  ├─ sampling.ts             # 纯函数:OBJ → 点云(加载/归一化/表面采样)
@@ -58,7 +61,8 @@ public/models/            # Queen.obj · Pawn.obj(形变目标模型)
 
 | 想改什么 | 去哪里 |
 | --- | --- |
-| 加/改作品项目、文案、邮箱、导航 | `src/content/site.tsx` |
+| 加/改作品项目(卡片+详情页+视频) | `src/content/site.tsx` 的 `projects` 数组 |
+| 文案、邮箱、导航 | `src/content/site.tsx` |
 | 粒子数量、颜色、大小、自转速度 | `src/config.ts` → `PARTICLES` |
 | 滚动经过哪些形状、顺序 | `src/config.ts` → `SHAPE_SEQUENCE` |
 | 新增形变模型 | `public/models/` 放 .obj → `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_SEQUENCE` |
@@ -99,7 +103,9 @@ Particles.useFrame: damp 阻尼追踪 → 映射到 SHAPE_SEQUENCE 区间
 - **不要把 `<StrictMode>` 加回 `main.tsx`**。开发模式的双重挂载会让 R3F 在同一 canvas 上 `forceContextLoss()` 且无法恢复,表现为粒子闪现一次后永久白屏。详见 commit `f34e17c`。
 - **`src/three/**` 里每帧改写 geometry buffer 是故意的**(R3F 惯用法,避免每帧分配)。ESLint 的 `react-hooks/purity` / `immutability` 规则只在该目录豁免 —— 不要把豁免范围扩大到 UI 层。
 - **滚动进度只能从 `useScrollProgress()` 拿**,不要再加第二个 `window.addEventListener("scroll")` —— Lenis 与原生滚动的值在动画期间不一致,两套来源必出同步 bug。后续接 GSAP ScrollTrigger 请用 `useLenis()` 拿实例做桥接。
+- **public/ 资源引用必须用绝对路径**(`/models/...`、`/projects/...`)。相对路径在 `/project/:slug` 子路由下会解析错误(曾导致 OBJ 加载 404、粒子背景消失)。
 - Windows 下 git 会报 LF→CRLF warning,无害。
+- 生产部署用 BrowserRouter 需要 SPA fallback(Vercel/Netlify 自动处理;GitHub Pages 需要 404.html 技巧)。
 
 ## 部署
 

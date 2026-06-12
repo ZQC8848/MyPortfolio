@@ -3,10 +3,12 @@
  * Tweak values in this file only — components read, never define, them.
  */
 
-/** OBJ models available as morph targets (served from /public). */
+/** OBJ models available as morph targets (served from /public).
+ *  Paths must be absolute — relative paths break on nested routes
+ *  like /project/:slug. */
 export const MODELS = {
-  queen: "models/Queen.obj",
-  pawn: "models/Pawn.obj",
+  queen: "/models/Queen.obj",
+  pawn: "/models/Pawn.obj",
 } as const;
 
 export type ShapeName = keyof typeof MODELS | "explode";
