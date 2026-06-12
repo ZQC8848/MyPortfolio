@@ -7,9 +7,10 @@
  *  Paths must be absolute — relative paths break on nested routes
  *  like /project/:slug. */
 export const MODELS = {
-  queen: "/models/Queen.obj",
-  pawn: "/models/Pawn.obj",
   quest3: "/models/meta_quest_3.obj",
+  david: "/models/David.obj",
+  fightOn: "/models/FightOn.obj",
+  rocket: "/models/rocket.obj",
 } as const;
 
 export type ShapeName = keyof typeof MODELS | "explode";
@@ -17,10 +18,12 @@ export type ShapeName = keyof typeof MODELS | "explode";
 /** Shapes the cloud morphs through, top of page → bottom. */
 export const SHAPE_SEQUENCE: readonly ShapeName[] = [
   "quest3",
-  "queen",
-  "pawn",
   "explode",
-  "quest3",
+  "david",
+  "explode",
+  "fightOn",
+  "explode",
+  "rocket",
 ];
 
 export const PARTICLES = {

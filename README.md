@@ -51,7 +51,7 @@ src/
 │  └─ shaders.ts              # 粒子的 vertex / fragment GLSL
 └─ styles/global.css      # 全部样式(BEM 命名,含响应式断点)
 
-public/models/            # Queen.obj · Pawn.obj · meta_quest_3.obj(形变目标模型)
+public/models/            # meta_quest_3 · David · FightOn · rocket(形变目标 .obj)
 .github/workflows/ci.yml  # push/PR 自动跑 lint + build
 ```
 
