@@ -285,6 +285,7 @@ function Particles({ routeKey }: { routeKey: string }) {
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  const swingTime = useRef(0);
   const progress = useRef(0);
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
@@ -368,9 +369,14 @@ function Particles({ routeKey }: { routeKey: string }) {
       uniforms.uRayDir.value.copy(raycaster.ray.direction);
     }
 
-    // Idle rotation stays cheap and per-frame; skipped for reduced motion.
+    // Idle motion: a sine swing around the base orientation — eased speed,
+    // never a full revolution. Skipped for reduced motion.
     if (!reducedMotion) {
-      pointsRef.current.rotation.y += delta * PARTICLES.idleRotation;
+      swingTime.current += delta;
+      pointsRef.current.rotation.y =
+        PARTICLES.initialRotationY +
+        Math.sin((swingTime.current * Math.PI * 2) / PARTICLES.swingPeriod) *
+          PARTICLES.swingAmplitude;
     }
 
     // Chase the scroll position (instantly under reduced motion).

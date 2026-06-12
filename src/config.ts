@@ -102,12 +102,19 @@ export const PARTICLES = {
   colorB: "#c084fc",
   /** How quickly the morph chases the scroll position (higher = snappier). */
   damp: 4,
-  /** Idle rotation speed, radians/second. */
-  idleRotation: 0.06,
   /**
-   * Starting Y rotation (radians). A 3/4 view reads much better than a
-   * head-on one for shapes like the headset, whose front-on silhouette
-   * is a low-density blob.
+   * Idle motion: instead of spinning full circles, the cloud rocks back and
+   * forth around its base orientation. The swing follows a sine curve, so
+   * angular speed is eased — slowest at the two extremes, fastest through
+   * the middle. Amplitude is radians to EACH side of initialRotationY.
+   */
+  swingAmplitude: 0.4,
+  /** Seconds for one full back-and-forth swing cycle. */
+  swingPeriod: 8,
+  /**
+   * Base Y rotation (radians), the centre of the swing. A 3/4 view reads
+   * much better than a head-on one for shapes like the headset, whose
+   * front-on silhouette is a low-density blob.
    */
   initialRotationY: 0.7,
 } as const;
@@ -146,9 +153,9 @@ export const POINTER_FX = {
    * whatever the cursor covers reacts at every depth (perspective-correct),
    * in both the main cloud and the ambient backdrop.
    */
-  repelRadius: 1,
+  repelRadius: 10,
   /** How far (world units) particles get pushed at the cursor centre. */
-  repelStrength: 2,
+  repelStrength: 0.5,
   /** Camera sway amplitude in world units: [horizontal, vertical]. */
   sway: [1.6, 1.0],
   /** How quickly the camera chases the pointer (damp lambda). */
