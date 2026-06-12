@@ -24,6 +24,11 @@ export interface Project {
   title: string;
   tag: string;
   blurb: string;
+  /**
+   * Featured projects render as full cards under "Selected Work"; everything
+   * else collapses into the compact archive list below them.
+   */
+  featured?: boolean;
   /** Card/detail cover image; omit to use a gradient placeholder card. */
   cover?: string;
   video?: ProjectVideo;
@@ -34,6 +39,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     slug: "syncscape",
+    featured: true,
     title: "SyncScape",
     tag: "Gaussian Splat · HCI · 2026",
     blurb:
@@ -120,6 +126,7 @@ export const projects: Project[] = [
   },
   {
     slug: "handspeaker",
+    featured: true,
     title: "HandSpeaker",
     tag: "HCI · ML · Hardware · XR",
     blurb:
@@ -178,6 +185,7 @@ export const projects: Project[] = [
   },
   {
     slug: "call-me-merlin",
+    featured: true,
     title: "Call Me Merlin",
     tag: "Multiplayer VR · Unity 6 · 2026",
     blurb:
@@ -239,6 +247,120 @@ export const projects: Project[] = [
             [Networked] properties, while VFX spawn as network objects so
             visuals and spatial audio stay consistent on every client without
             extra round-trips.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "vr-haptic-research",
+    featured: true,
+    title: "Vibrotactile Texture Perception in VR",
+    tag: "Haptics Research · XR · 2026",
+    blurb:
+      "User study on vibrotactile texture perception — can rumble alone teach your fingers a texture?",
+    cover: "/projects/vr-haptic-research.jpeg",
+    video: { type: "vimeo", id: "1158598193" },
+    meta: [
+      { label: "Type", value: "Research · Haptics" },
+      { label: "Stack", value: "Quest 3 · Meta Haptic Studio" },
+      { label: "Date", value: "2026 · ongoing" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An ongoing user study (sole author, advised by Prof. Heather
+            Culbertson) on how people recognize textures rendered purely as
+            controller vibration in VR — comparing absolute identification
+            against relative discrimination.
+          </>
+        ),
+      },
+      {
+        heading: "Method",
+        body: (
+          <>
+            Haptic stimuli are authored in Meta Haptic Studio and paired with
+            auditory feedback across three experimental conditions, varying
+            how participants are tactilely grounded before each judgment.
+          </>
+        ),
+      },
+      {
+        heading: "Current work",
+        body: (
+          <>
+            Analyzing recognition accuracy and confidence ratings across
+            grounding phases; results are being prepared for publication.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "facade-vr",
+    featured: true,
+    title: "Facade VR",
+    tag: "AI Narrative · VR · In Development",
+    blurb:
+      "Reimagining the classic interactive drama Façade with LLMs and embodied VR input.",
+    meta: [
+      { label: "Type", value: "Research · AI Narrative" },
+      { label: "Focus", value: "LLM drama management · embodied input" },
+      { label: "Status", value: "In development · 2026" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            Façade (Mateas &amp; Stern, 2005) is still the landmark of
+            interactive drama: free-text conversation driving a structured
+            one-act play. Facade VR rebuilds that ambition with the tools of
+            this decade — large language models for understanding and
+            dialogue, spatial computing for presence — aiming at a drama that
+            responds not just to what you say, but to what you do in the
+            room. This is my current research focus.
+          </>
+        ),
+      },
+      {
+        heading: "Standing on Façade's shoulders",
+        body: (
+          <>
+            The original&apos;s key abstractions survive: dramatic beats as
+            the unit of story, and discourse acts as the symbolic layer
+            between open input and structured drama. LLMs replace what
+            actually failed in 2005 — natural-language understanding and the
+            crushing cost of hand-authoring content — while a drama manager
+            keeps generation pinned to a deliberate tension arc instead of
+            letting the model wander.
+          </>
+        ),
+      },
+      {
+        heading: "The body as dramatic input",
+        body: (
+          <>
+            In VR, physical behavior becomes a dramatic variable. Standing
+            between two arguing characters, meeting (or avoiding) someone&apos;s
+            gaze, picking up the wrong glass at the wrong moment — eye
+            tracking, hand tracking, and position turn embodiment itself into
+            the language you address the play with.
+          </>
+        ),
+      },
+      {
+        heading: "Research direction",
+        body: (
+          <>
+            The crisp technical claim: keep Façade&apos;s beat-selection
+            structure, but replace its hand-written scoring formula with a
+            reward model learned from human preference annotations —
+            bootstrapped by LLM self-play. Full design notes and a prototype
+            are in progress.
           </>
         ),
       },
@@ -346,52 +468,6 @@ export const projects: Project[] = [
             Gemini maps natural-language commands to gameplay actions —
             switching, passing, tactics — so the voice channel acts as a
             full input device rather than a menu shortcut.
-          </>
-        ),
-      },
-    ],
-  },
-  {
-    slug: "vr-haptic-research",
-    title: "Vibrotactile Texture Perception in VR",
-    tag: "Haptics Research · XR · 2026",
-    blurb:
-      "User study on vibrotactile texture perception — can rumble alone teach your fingers a texture?",
-    cover: "/projects/vr-haptic-research.jpeg",
-    video: { type: "vimeo", id: "1158598193" },
-    meta: [
-      { label: "Type", value: "Research · Haptics" },
-      { label: "Stack", value: "Quest 3 · Meta Haptic Studio" },
-      { label: "Date", value: "2026 · ongoing" },
-    ],
-    sections: [
-      {
-        heading: "Overview",
-        body: (
-          <>
-            An ongoing user study (sole author, advised by Prof. Heather
-            Culbertson) on how people recognize textures rendered purely as
-            controller vibration in VR — comparing absolute identification
-            against relative discrimination.
-          </>
-        ),
-      },
-      {
-        heading: "Method",
-        body: (
-          <>
-            Haptic stimuli are authored in Meta Haptic Studio and paired with
-            auditory feedback across three experimental conditions, varying
-            how participants are tactilely grounded before each judgment.
-          </>
-        ),
-      },
-      {
-        heading: "Current work",
-        body: (
-          <>
-            Analyzing recognition accuracy and confidence ratings across
-            grounding phases; results are being prepared for publication.
           </>
         ),
       },

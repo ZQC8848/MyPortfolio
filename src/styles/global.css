@@ -300,6 +300,42 @@ em {
   color: var(--muted);
 }
 
+/* Archive: the non-featured long tail as compact text rows. */
+.work__archive {
+  margin-top: 3.5rem;
+}
+.archive {
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.archive__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2rem;
+  padding: 0.95rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.25s, padding-left 0.25s;
+}
+.archive__row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  padding-left: 0.75rem;
+}
+.archive__title {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.archive__tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+
 /* Expand/collapse pill under the grid — same language as the hero CTA. */
 .work__toggle {
   display: block;
@@ -478,6 +514,15 @@ em {
 
   .work__grid {
     grid-template-columns: 1fr;
+  }
+
+  .archive__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+  .archive__tag {
+    text-align: left;
   }
 
   .project__meta {
