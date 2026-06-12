@@ -19,18 +19,13 @@ export type ShapeName = keyof typeof MODELS | "explode";
 export interface ShapeKeyframe {
   shape: ShapeName;
   /**
-   * Scroll progress (0–1) at which the cloud has fully contracted into this
-   * shape. Prefer `anchor` for shapes that must sync with a page section —
-   * fixed fractions only hold for one layout, and section positions shift
-   * with viewport width. Omit entirely (e.g. on "explode" fillers) to get
-   * the midpoint between the neighbouring keyframes.
-   */
-  at?: number;
-  /**
    * CSS selector of the section this shape syncs to (e.g. "#about"). The
    * actual progress is measured from the element's real position and
-   * re-measured on resize, so it stays correct on any viewport. When the
-   * element is missing (other routes), `at` is used as fallback.
+   * re-measured on resize, so it stays correct on any viewport. On pages
+   * missing any anchored element (e.g. /project/:slug), the background
+   * falls back to a static "explode" scatter instead of the morph timeline.
+   * Keyframes without an anchor are spaced automatically: first at the page
+   * top, last at the bottom, middles evenly between their neighbours.
    */
   anchor?: string;
   /**
@@ -39,6 +34,13 @@ export interface ShapeKeyframe {
    * "section heading just arrived at the top of the screen".
    */
   anchorViewport?: number;
+  /**
+   * How long the fully-formed shape lingers before morphing on, as a
+   * fraction of total page scroll (0.1 = stays converged for 10% of the
+   * scroll). Anchored shapes hold from their anchor point onward; the
+   * first/last keyframes hold at the page top/bottom. Default 0.
+   */
+  hold?: number;
   /**
    * Rotation offset: axis (auto-normalized) + angle in radians. Applied in
    * screen space on top of the idle spin, so e.g. a Z-axis tilt stays a
@@ -63,13 +65,13 @@ export interface ShapeKeyframe {
  * different orientation/position/size.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
-  { shape: "david", at: 0 },
+  { shape: "david", hold: 0.08 },
   { shape: "explode" },
-  { shape: "quest3", anchor: "#about", at: 0.4, offset: [2, 0, 0] },
+  { shape: "quest3", anchor: "#about", hold: 0.12, offset: [2, 0, 0] },
   { shape: "explode" },
   {
     shape: "rocket",
-    at: 1,
+    hold: 0.08,
     offset: [9, 0, 0],
     rotateAxis: [0, 0, 1],
     rotateAngle: -0.32,

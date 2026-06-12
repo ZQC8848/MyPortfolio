@@ -64,7 +64,9 @@ public/models/            # meta_quest_3 · David · FightOn · rocket(形变目
 | 加/改作品项目(卡片+详情页+视频) | `src/content/site.tsx` 的 `projects` 数组 |
 | 文案、邮箱、导航 | `src/content/site.tsx` |
 | 粒子数量、颜色、大小、自转速度 | `src/config.ts` → `PARTICLES` |
-| 滚动经过哪些形状、各自在哪个进度成形 | `src/config.ts` → `SHAPE_KEYFRAMES`:与页面区块同步用 `anchor: "#about"`(任意分辨率都准);固定进度用 `at`;两者都不写则自动取相邻帧中点 |
+| 滚动经过哪些形状、各自在哪个进度成形 | `src/config.ts` → `SHAPE_KEYFRAMES`:与页面区块同步用 `anchor: "#about"`(任意分辨率都准);不写 anchor 则首帧在页顶、末帧在页底、中间帧自动均分 |
+| 形状成形后停留多久再继续形变 | `SHAPE_KEYFRAMES` 条目的 `hold`(占总滚动的比例,如 0.1 = 停留 10%) |
+| 项目详情页背景 | 自动回退为 explode 星散(页面缺少锚点区块时的统一行为) |
 | 单个形状的旋转/位置/大小微调 | `SHAPE_KEYFRAMES` 条目的 `rotateAxis`+`rotateAngle` / `offset` / `scale` |
 | 新增形变模型 | `public/models/` 放 .obj → `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_KEYFRAMES`(有面网格和纯点云 .obj 都支持) |
 | 相机距离/视角、竖屏适配强度 | `src/config.ts` → `CAMERA` |

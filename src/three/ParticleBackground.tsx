@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
@@ -26,55 +27,95 @@ const MODEL_PATHS = MODEL_KEYS.map((k) => MODELS[k]);
 
 type Vec3 = readonly [number, number, number];
 
+/** One point on the resolved timeline: progress `at` shows keyframe `kf`. */
+interface TimelineStop {
+  at: number;
+  kf: number;
+}
+interface Timeline {
+  stops: TimelineStop[];
+  offsets: Vec3[];
+}
+
 /**
- * Resolve each keyframe's scroll progress and position offset for the
- * CURRENT layout. Anchored keyframes are measured from their element's real
- * document position (so they track the section across any viewport width);
- * keyframes with neither anchor nor `at` get the midpoint between their
- * resolved neighbours. Called on mount and again whenever the page resizes
- * or its content height changes.
+ * Resolve the morph timeline for the CURRENT layout. Each keyframe becomes
+ * an [enter, exit] pair — the shape is fully formed at `enter` and starts
+ * dissolving at `exit = enter + hold`. Anchored keyframes measure `enter`
+ * from their element's real document position (correct on any viewport
+ * width); unanchored ones are spaced into the surrounding gaps. If any
+ * anchored element is missing (e.g. on /project/:slug), the page doesn't
+ * have the sections this timeline is choreographed around, so the
+ * background falls back to a static explode scatter.
  */
-function resolveTimeline(): { ats: number[]; offsets: Vec3[] } {
-  const maxScroll =
-    document.documentElement.scrollHeight - window.innerHeight;
-
-  const ats: (number | null)[] = SHAPE_KEYFRAMES.map((kf) => {
-    if (kf.anchor && maxScroll > 0) {
-      const el = document.querySelector(kf.anchor);
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.scrollY;
-        const target = top - (kf.anchorViewport ?? 0.1) * window.innerHeight;
-        return THREE.MathUtils.clamp(target / maxScroll, 0, 1);
-      }
-    }
-    return kf.at ?? null;
-  });
-
-  // Endpoints default to the page edges; gaps become evenly spaced stops
-  // between the nearest resolved neighbours.
-  if (ats[0] === null) ats[0] = 0;
-  if (ats[ats.length - 1] === null) ats[ats.length - 1] = 1;
-  for (let i = 1; i < ats.length - 1; i++) {
-    if (ats[i] !== null) continue;
-    let j = i + 1;
-    while (ats[j] === null) j++;
-    const a = ats[i - 1]!;
-    const b = ats[j]!;
-    for (let k = i; k < j; k++) {
-      ats[k] = a + ((b - a) * (k - i + 1)) / (j - i + 1);
-    }
-  }
-  // Keep the timeline strictly ascending even if an anchor lands out of order.
-  const resolved = ats as number[];
-  for (let i = 1; i < resolved.length; i++) {
-    resolved[i] = Math.max(resolved[i], resolved[i - 1] + 1e-3);
-  }
-
+function resolveTimeline(): Timeline {
+  const kfs = SHAPE_KEYFRAMES;
+  const n = kfs.length;
   const mobile = isMobileViewport();
-  const offsets = SHAPE_KEYFRAMES.map<Vec3>(
+  const offsets = kfs.map<Vec3>(
     (kf) => (mobile ? kf.offsetMobile ?? kf.offset : kf.offset) ?? [0, 0, 0]
   );
-  return { ats: resolved, offsets };
+  const hold = (i: number) => kfs[i].hold ?? 0;
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+  const enter: (number | null)[] = new Array(n).fill(null);
+  const exit: (number | null)[] = new Array(n).fill(null);
+  for (let i = 0; i < n; i++) {
+    const sel = kfs[i].anchor;
+    if (!sel) continue;
+    const el = document.querySelector(sel);
+    if (!el || maxScroll <= 0) {
+      const e = Math.max(kfs.findIndex((k) => k.shape === "explode"), 0);
+      return {
+        stops: [
+          { at: 0, kf: e },
+          { at: 1, kf: e },
+        ],
+        offsets,
+      };
+    }
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const target = top - (kfs[i].anchorViewport ?? 0.1) * window.innerHeight;
+    enter[i] = THREE.MathUtils.clamp(target / maxScroll, 0, 1);
+    exit[i] = enter[i]! + hold(i);
+  }
+
+  // Unanchored endpoints hold at the page edges.
+  if (enter[0] === null) {
+    enter[0] = 0;
+    exit[0] = hold(0);
+  }
+  if (enter[n - 1] === null) {
+    exit[n - 1] = 1;
+    enter[n - 1] = 1 - hold(n - 1);
+  }
+  // Unanchored middles: split the gap between the surrounding resolved
+  // keyframes into equal morph transitions, reserving room for holds.
+  for (let i = 1; i < n - 1; i++) {
+    if (enter[i] !== null) continue;
+    let j = i + 1;
+    while (enter[j] === null) j++;
+    let holdSum = 0;
+    for (let k = i; k < j; k++) holdSum += hold(k);
+    const gap = enter[j]! - exit[i - 1]!;
+    const morph = Math.max(gap - holdSum, 0) / (j - i + 1);
+    let cursor = exit[i - 1]!;
+    for (let k = i; k < j; k++) {
+      enter[k] = cursor + morph;
+      exit[k] = enter[k]! + hold(k);
+      cursor = exit[k]!;
+    }
+  }
+
+  // Flatten to a non-decreasing stop list (anchors can land out of order).
+  const stops: TimelineStop[] = [];
+  let prev = 0;
+  for (let i = 0; i < n; i++) {
+    const e0 = Math.max(enter[i]!, prev);
+    const e1 = Math.max(exit[i]!, e0);
+    stops.push({ at: e0, kf: i }, { at: e1, kf: i });
+    prev = e1;
+  }
+  return { stops, offsets };
 }
 
 /** Pulls the camera back on narrow/portrait viewports so the model fits. */
@@ -96,7 +137,7 @@ function ResponsiveCamera() {
   return null;
 }
 
-function Particles() {
+function Particles({ routeKey }: { routeKey: string }) {
   const scroll = useScrollProgress();
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
@@ -104,13 +145,14 @@ function Particles() {
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
   const count = useMemo(() => getParticleCount(), []);
-  const timeline = useRef<ReturnType<typeof resolveTimeline> | null>(null);
+  const timeline = useRef<Timeline | null>(null);
 
   const loaded = useLoader(OBJLoader, MODEL_PATHS);
 
   // Measure anchored keyframes against the live layout, and re-measure when
-  // the viewport or the document height changes (resize, images loading,
-  // route switches) — this is what keeps the sync correct on mobile widths.
+  // the route, the viewport, or the document height changes (resize, images
+  // loading) — this is what keeps the sync correct on mobile widths and
+  // switches project pages to the explode-only fallback.
   useEffect(() => {
     const update = () => {
       timeline.current = resolveTimeline();
@@ -124,7 +166,7 @@ function Particles() {
       ro.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [routeKey]);
 
   const { geometry, uniforms, shapes, quaternions } = useMemo(() => {
     const bank: Partial<Record<string, Float32Array>> = {
@@ -162,7 +204,7 @@ function Particles() {
 
   useFrame((_, delta) => {
     if (!timeline.current) return;
-    const { ats, offsets } = timeline.current;
+    const { stops, offsets } = timeline.current;
 
     // Idle rotation stays cheap and per-frame; skipped for reduced motion.
     if (!reducedMotion) {
@@ -178,41 +220,44 @@ function Particles() {
     if (Math.abs(progress.current - lastWritten.current) < 1e-4) return;
     lastWritten.current = progress.current;
 
-    // Find the keyframe segment containing the current progress (the
-    // resolved timings are ascending), then lerp the two neighbouring banks.
+    // Find the stop segment containing the current progress (the resolved
+    // stops are ascending). Between a keyframe's enter/exit stops both ends
+    // are the same shape — that's the hold.
     const f = THREE.MathUtils.clamp(progress.current, 0, 1);
-    let i0 = 0;
-    for (let i = ats.length - 2; i >= 0; i--) {
-      if (f >= ats[i]) {
-        i0 = i;
+    let s = 0;
+    for (let i = stops.length - 2; i >= 0; i--) {
+      if (f >= stops[i].at) {
+        s = i;
         break;
       }
     }
-    const a0 = ats[i0];
-    const a1 = ats[i0 + 1];
+    const a0 = stops[s].at;
+    const a1 = stops[s + 1].at;
     const t = THREE.MathUtils.smoothstep(
       a1 > a0 ? (f - a0) / (a1 - a0) : 1,
       0,
       1
     );
+    const k0 = stops[s].kf;
+    const k1 = stops[s + 1].kf;
 
     // Keyframe offsets live on the outer group (screen space): position is
     // lerped, rotation slerped — the inner points' idle spin can't drag them.
-    const o0 = offsets[i0];
-    const o1 = offsets[i0 + 1];
+    const o0 = offsets[k0];
+    const o1 = offsets[k1];
     groupRef.current.position.set(
       o0[0] + (o1[0] - o0[0]) * t,
       o0[1] + (o1[1] - o0[1]) * t,
       o0[2] + (o1[2] - o0[2]) * t
     );
     groupRef.current.quaternion.slerpQuaternions(
-      quaternions[i0],
-      quaternions[i0 + 1],
+      quaternions[k0],
+      quaternions[k1],
       t
     );
 
-    const a = shapes[i0];
-    const b = shapes[i0 + 1];
+    const a = shapes[k0];
+    const b = shapes[k1];
     const pos = geometry.attributes.position.array as Float32Array;
     for (let i = 0; i < pos.length; i++) {
       pos[i] = a[i] + (b[i] - a[i]) * t;
@@ -242,6 +287,9 @@ function Particles() {
 }
 
 export default function ParticleBackground() {
+  // Re-resolve the timeline when the route changes — project pages don't
+  // have the anchored sections and fall back to the explode scatter.
+  const { pathname } = useLocation();
   return (
     <div className="bg-canvas">
       <Canvas
@@ -256,7 +304,7 @@ export default function ParticleBackground() {
         }}
       >
         <ResponsiveCamera />
-        <Particles />
+        <Particles routeKey={pathname} />
       </Canvas>
     </div>
   );
