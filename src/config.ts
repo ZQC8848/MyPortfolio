@@ -140,10 +140,14 @@ export const AMBIENT_PARTICLES = {
  * a couple of damped floats per frame.
  */
 export const POINTER_FX = {
-  /** World-space radius of the repulsion field around the cursor. */
-  repelRadius: 6,
+  /**
+   * Radius of the repulsion field around the cursor, in world units across
+   * the screen plane. The field is a screen-aligned cylinder: it reaches
+   * through the cloud's full depth, so front and back particles react alike.
+   */
+  repelRadius: 3,
   /** How far (world units) particles get pushed at the cursor centre. */
-  repelStrength: 4,
+  repelStrength: 5,
   /** Camera sway amplitude in world units: [horizontal, vertical]. */
   sway: [1.6, 1.0],
   /** How quickly the camera chases the pointer (damp lambda). */
