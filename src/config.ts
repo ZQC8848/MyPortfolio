@@ -24,7 +24,11 @@ export interface ShapeKeyframe {
    * Between two keyframes the cloud is mid-morph.
    */
   at: number;
-  /** Rotation offset: axis (auto-normalized) + angle in radians. */
+  /**
+   * Rotation offset: axis (auto-normalized) + angle in radians. Applied in
+   * screen space on top of the idle spin, so e.g. a Z-axis tilt stays a
+   * constant on-screen lean while the shape keeps spinning underneath.
+   */
   rotateAxis?: readonly [number, number, number];
   rotateAngle?: number;
   /**
@@ -44,11 +48,15 @@ export interface ShapeKeyframe {
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
   { shape: "david", at: 0 },
   { shape: "explode", at: 0.17 },
-  { shape: "quest3", at: 0.33 },
+  { shape: "quest3", at: 0.4 ,offset: [2, 0, 0] },
   { shape: "explode", at: 0.5 },
-  { shape: "fightOn", at: 0.67 },
-  { shape: "explode", at: 0.83 },
-  { shape: "rocket", at: 1, offset: [9, 0, 0] },
+  {
+    shape: "rocket",
+    at: 1,
+    offset: [9, 0, 0],
+    rotateAxis: [0, 0, 1],
+    rotateAngle: -0.32,
+  },
 ];
 
 export const PARTICLES = {

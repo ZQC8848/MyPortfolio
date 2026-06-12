@@ -14,8 +14,9 @@ import {
 import { useScrollProgress } from "../lib/ScrollContext";
 import { particleFragmentShader, particleVertexShader } from "./shaders";
 import {
-  applyKeyframeOffsets,
+  applyKeyframeScale,
   explodePositions,
+  keyframeQuaternion,
   shapeFromObj,
 } from "./sampling";
 
@@ -43,6 +44,7 @@ function ResponsiveCamera() {
 
 function Particles() {
   const scroll = useScrollProgress();
+  const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
   const progress = useRef(0);
   const lastWritten = useRef(-1);
@@ -51,20 +53,21 @@ function Particles() {
 
   const loaded = useLoader(OBJLoader, MODEL_PATHS);
 
-  const { geometry, uniforms, shapes, offsets } = useMemo(() => {
+  const { geometry, uniforms, shapes, offsets, quaternions } = useMemo(() => {
     const bank: Partial<Record<string, Float32Array>> = {
       explode: explodePositions(count),
     };
     MODEL_KEYS.forEach((key, i) => {
       bank[key] = shapeFromObj(loaded[i], count);
     });
-    // Bake per-keyframe rotation/scale so the same model can appear with a
-    // different orientation/size at different scroll stops. Position offsets
-    // are interpolated per-frame in useFrame (world space, spin-proof).
+    // Bake per-keyframe scale into the banks; rotation and position offsets
+    // are interpolated per-frame at the group level in useFrame, so they stay
+    // fixed in screen space while the inner points object idle-spins.
     const seq = SHAPE_KEYFRAMES.map((kf) =>
-      applyKeyframeOffsets(bank[kf.shape]!, kf)
+      applyKeyframeScale(bank[kf.shape]!, kf)
     );
     const offs = SHAPE_KEYFRAMES.map((kf) => kf.offset ?? [0, 0, 0]);
+    const quats = SHAPE_KEYFRAMES.map(keyframeQuaternion);
 
     const randoms = new Float32Array(count);
     for (let i = 0; i < count; i++) randoms[i] = Math.random();
@@ -82,7 +85,13 @@ function Particles() {
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
     };
-    return { geometry: geo, uniforms: u, shapes: seq, offsets: offs };
+    return {
+      geometry: geo,
+      uniforms: u,
+      shapes: seq,
+      offsets: offs,
+      quaternions: quats,
+    };
   }, [loaded, count]);
 
   useFrame((_, delta) => {
@@ -118,13 +127,19 @@ function Particles() {
       1
     );
 
-    // World-space position offset, interpolated with the same easing.
+    // Keyframe offsets live on the outer group (screen space): position is
+    // lerped, rotation slerped — the inner points' idle spin can't drag them.
     const o0 = offsets[i0];
     const o1 = offsets[i0 + 1];
-    pointsRef.current.position.set(
+    groupRef.current.position.set(
       o0[0] + (o1[0] - o0[0]) * t,
       o0[1] + (o1[1] - o0[1]) * t,
       o0[2] + (o1[2] - o0[2]) * t
+    );
+    groupRef.current.quaternion.slerpQuaternions(
+      quaternions[i0],
+      quaternions[i0 + 1],
+      t
     );
 
     const a = shapes[i0];
@@ -137,21 +152,23 @@ function Particles() {
   });
 
   return (
-    <points
-      ref={pointsRef}
-      geometry={geometry}
-      rotation={[0, PARTICLES.initialRotationY, 0]}
-      frustumCulled={false}
-    >
-      <shaderMaterial
-        uniforms={uniforms}
-        vertexShader={particleVertexShader}
-        fragmentShader={particleFragmentShader}
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
+    <group ref={groupRef}>
+      <points
+        ref={pointsRef}
+        geometry={geometry}
+        rotation={[0, PARTICLES.initialRotationY, 0]}
+        frustumCulled={false}
+      >
+        <shaderMaterial
+          uniforms={uniforms}
+          vertexShader={particleVertexShader}
+          fragmentShader={particleFragmentShader}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+    </group>
   );
 }
 

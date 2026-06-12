@@ -97,35 +97,33 @@ export function shapeFromObj(obj: THREE.Object3D, count: number): Float32Array {
 }
 
 /**
- * Bake a keyframe's scale → rotation offsets into a copy of the shape bank.
- * Position offsets are NOT baked here — they're applied per-frame to the
- * points object instead, so they stay in world space and the idle Y-spin
- * doesn't swing them around. Returns the original array untouched when there
- * is nothing to bake, so plain keyframes share memory.
+ * Bake a keyframe's scale into a copy of the shape bank. Rotation and
+ * position offsets are NOT baked — they're applied per-frame at the object
+ * level (interpolated between keyframes), so they stay fixed in screen space
+ * instead of being swung around by the idle Y-spin. Returns the original
+ * array untouched when scale is 1, so plain keyframes share memory.
  */
-export function applyKeyframeOffsets(
+export function applyKeyframeScale(
   src: Float32Array,
   kf: ShapeKeyframe
 ): Float32Array {
   const scale = kf.scale ?? 1;
-  const angle = kf.rotateAngle ?? 0;
-  const hasRotation = !!kf.rotateAxis && angle !== 0;
-  if (scale === 1 && !hasRotation) return src;
-
-  const q = new THREE.Quaternion();
-  if (hasRotation) {
-    q.setFromAxisAngle(new THREE.Vector3(...kf.rotateAxis!).normalize(), angle);
-  }
+  if (scale === 1) return src;
   const out = new Float32Array(src.length);
-  const v = new THREE.Vector3();
-  for (let i = 0; i < src.length; i += 3) {
-    v.set(src[i] * scale, src[i + 1] * scale, src[i + 2] * scale);
-    if (hasRotation) v.applyQuaternion(q);
-    out[i] = v.x;
-    out[i + 1] = v.y;
-    out[i + 2] = v.z;
-  }
+  for (let i = 0; i < src.length; i++) out[i] = src[i] * scale;
   return out;
+}
+
+/** Keyframe rotation offset as a quaternion (identity when unset). */
+export function keyframeQuaternion(kf: ShapeKeyframe): THREE.Quaternion {
+  const q = new THREE.Quaternion();
+  if (kf.rotateAxis && kf.rotateAngle) {
+    q.setFromAxisAngle(
+      new THREE.Vector3(...kf.rotateAxis).normalize(),
+      kf.rotateAngle
+    );
+  }
+  return q;
 }
 
 /** Procedural random scatter — the "explode" morph target. */
