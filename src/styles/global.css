@@ -243,6 +243,10 @@ em {
   transform: translateY(-6px);
   border-color: rgba(255, 255, 255, 0.28);
 }
+/* `.card` sets display:flex, which would override the UA [hidden] rule. */
+.work__grid .card[hidden] {
+  display: none;
+}
 
 .card__media {
   aspect-ratio: 16 / 10;
@@ -309,16 +313,21 @@ em {
 }
 .archive__row {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 2rem;
-  padding: 0.95rem 0.25rem;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.05rem 0.25rem;
   border-bottom: 1px solid var(--line);
   transition: background 0.25s, padding-left 0.25s;
 }
 .archive__row:hover {
   background: rgba(255, 255, 255, 0.04);
   padding-left: 0.75rem;
+}
+.archive__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2rem;
 }
 .archive__title {
   font-size: 1.05rem;
@@ -331,6 +340,13 @@ em {
   color: var(--muted);
   text-align: right;
   flex-shrink: 0;
+}
+.archive__desc {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 75ch;
 }
 
 /* Expand/collapse pill under the grid — same language as the hero CTA. */
@@ -513,7 +529,7 @@ em {
     grid-template-columns: 1fr;
   }
 
-  .archive__row {
+  .archive__head {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.3rem;
