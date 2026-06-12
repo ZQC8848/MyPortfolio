@@ -2,7 +2,8 @@ export const particleVertexShader = /* glsl */ `
   uniform float uSize;
   uniform vec2 uSizeRange;
   uniform float uPixelRatio;
-  uniform vec3 uMouse;
+  uniform vec3 uRayOrigin;
+  uniform vec3 uRayDir;
   uniform float uMouseRadius;
   uniform float uMouseStrength;
   uniform float uTime;
@@ -12,20 +13,23 @@ export const particleVertexShader = /* glsl */ `
   void main() {
     vRandom = aRandom;
     vec4 world = modelMatrix * vec4(position, 1.0);
-    vec4 mv = viewMatrix * world;
 
-    // Pointer repulsion as a screen-aligned cylinder: distance is measured
-    // only across the view plane (xy), so every particle under the cursor
-    // reacts no matter how deep it sits — front and back of the cloud open
-    // together. Push happens in the same plane, with smoothstep falloff and
-    // a per-particle shimmer. uMouse defaults far away (term disabled).
-    vec2 mouseView = (viewMatrix * vec4(uMouse, 1.0)).xy;
-    float dist = distance(mv.xy, mouseView);
-    float falloff = smoothstep(uMouseRadius * (0.8 + aRandom * 0.4), 0.0, dist);
-    vec2 dir = (mv.xy - mouseView) / max(dist, 0.0001);
-    mv.xy += dir * falloff * uMouseStrength
+    // Pointer repulsion around the camera→cursor ray: each particle is
+    // pushed away from its closest point on the ray, so the field is a
+    // cylinder cast from the camera through the cursor — whatever the
+    // cursor covers on screen reacts, at every depth, perspective-correct.
+    // uRayOrigin defaults far away, which disables the whole term.
+    vec3 toP = world.xyz - uRayOrigin;
+    float along = dot(toP, uRayDir);
+    vec3 axisPoint = uRayOrigin + along * uRayDir;
+    float dist = distance(world.xyz, axisPoint);
+    float falloff = smoothstep(uMouseRadius * (0.8 + aRandom * 0.4), 0.0, dist)
+      * step(0.0, along);
+    vec3 dir = (world.xyz - axisPoint) / max(dist, 0.0001);
+    world.xyz += dir * falloff * uMouseStrength
       * (0.85 + 0.15 * sin(uTime * 2.0 + aRandom * 6.2832));
 
+    vec4 mv = viewMatrix * world;
     gl_Position = projectionMatrix * mv;
     gl_PointSize = uSize * mix(uSizeRange.x, uSizeRange.y, aRandom)
       * uPixelRatio * (1.0 / -mv.z);

@@ -141,13 +141,14 @@ export const AMBIENT_PARTICLES = {
  */
 export const POINTER_FX = {
   /**
-   * Radius of the repulsion field around the cursor, in world units across
-   * the screen plane. The field is a screen-aligned cylinder: it reaches
-   * through the cloud's full depth, so front and back particles react alike.
+   * Radius of the repulsion field, in world units around the camera→cursor
+   * ray. The field is a cylinder cast from the camera through the cursor:
+   * whatever the cursor covers reacts at every depth (perspective-correct),
+   * in both the main cloud and the ambient backdrop.
    */
-  repelRadius: 3,
+  repelRadius: 1,
   /** How far (world units) particles get pushed at the cursor centre. */
-  repelStrength: 5,
+  repelStrength: 2,
   /** Camera sway amplitude in world units: [horizontal, vertical]. */
   sway: [1.6, 1.0],
   /** How quickly the camera chases the pointer (damp lambda). */

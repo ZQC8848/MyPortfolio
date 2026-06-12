@@ -184,6 +184,9 @@ function ResponsiveCamera() {
   return null;
 }
 
+/** Far-away default so the repulsion term is zero until the pointer moves. */
+const MOUSE_PARKED = new THREE.Vector3(1e6, 1e6, 1e6);
+
 /**
  * Sparse, never-morphing explode scatter behind the main cloud — a cheap
  * depth layer for the home page. Same shader, fewer/wider/smaller points.
@@ -192,7 +195,9 @@ function ResponsiveCamera() {
  */
 function AmbientScatter() {
   const scroll = useScrollProgress();
+  const pointer = useWindowPointer();
   const pointsRef = useRef<THREE.Points>(null!);
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const spin = useRef(0);
   const precession = useRef(0);
   const axis = useRef(new THREE.Vector3(0, 1, 0));
@@ -224,17 +229,24 @@ function AmbientScatter() {
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
-      // Shares the main vertex shader; zero strength keeps the backdrop
-      // indifferent to the pointer.
-      uMouse: { value: MOUSE_PARKED.clone() },
-      uMouseRadius: { value: 0 },
-      uMouseStrength: { value: 0 },
+      uRayOrigin: { value: MOUSE_PARKED.clone() },
+      uRayDir: { value: new THREE.Vector3(0, 0, -1) },
+      uMouseRadius: { value: POINTER_FX.repelRadius },
+      uMouseStrength: { value: POINTER_FX.repelStrength },
       uTime: { value: 0 },
     };
     return { geometry: geo, uniforms: u };
   }, [count]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
+    // The backdrop reacts to the pointer too — same camera→cursor ray.
+    uniforms.uTime.value += delta;
+    if (pointer.current) {
+      raycaster.setFromCamera(pointer.current, state.camera);
+      uniforms.uRayOrigin.value.copy(raycaster.ray.origin);
+      uniforms.uRayDir.value.copy(raycaster.ray.direction);
+    }
+
     if (reducedMotion) return;
     // Idle counter-spin plus a scroll-coupled term; the spin axis itself
     // precesses around vertical at its own slow rate.
@@ -267,20 +279,12 @@ function AmbientScatter() {
   );
 }
 
-/** Far-away default so the repulsion term is zero until the pointer moves. */
-const MOUSE_PARKED = new THREE.Vector3(1e6, 1e6, 1e6);
-
 function Particles({ routeKey }: { routeKey: string }) {
   const scroll = useScrollProgress();
   const pointer = useWindowPointer();
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
-  const mousePlane = useMemo(
-    () => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0),
-    []
-  );
-  const mouseWorld = useRef(new THREE.Vector3());
   const progress = useRef(0);
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
@@ -341,7 +345,8 @@ function Particles({ routeKey }: { routeKey: string }) {
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
-      uMouse: { value: MOUSE_PARKED.clone() },
+      uRayOrigin: { value: MOUSE_PARKED.clone() },
+      uRayDir: { value: new THREE.Vector3(0, 0, -1) },
       uMouseRadius: { value: POINTER_FX.repelRadius },
       uMouseStrength: { value: POINTER_FX.repelStrength },
       uTime: { value: 0 },
@@ -353,15 +358,14 @@ function Particles({ routeKey }: { routeKey: string }) {
     if (!timeline.current) return;
     const { stops, offsets } = timeline.current;
 
-    // Pointer repulsion: project the cursor onto the z=0 plane and hand the
-    // world position to the vertex shader. Runs before the scroll early-out
-    // because hovering must work while the page is still.
+    // Pointer repulsion: hand the camera→cursor ray to the vertex shader.
+    // Runs before the scroll early-out because hovering must work while
+    // the page is still.
     uniforms.uTime.value += delta;
     if (pointer.current) {
       raycaster.setFromCamera(pointer.current, state.camera);
-      if (raycaster.ray.intersectPlane(mousePlane, mouseWorld.current)) {
-        uniforms.uMouse.value.copy(mouseWorld.current);
-      }
+      uniforms.uRayOrigin.value.copy(raycaster.ray.origin);
+      uniforms.uRayDir.value.copy(raycaster.ray.direction);
     }
 
     // Idle rotation stays cheap and per-frame; skipped for reduced motion.
