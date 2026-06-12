@@ -8,6 +8,7 @@ export default function Hero() {
       <div className="hero__content">
         <p className="hero__eyebrow">{hero.eyebrow}</p>
         <h1 className="hero__title">{hero.title}</h1>
+        <p className="hero__tagline">{hero.tagline}</p>
         <Link className="hero__cta" to={hero.cta.href}>
           {hero.cta.label}
         </Link>

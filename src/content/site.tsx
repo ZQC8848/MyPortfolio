@@ -264,14 +264,18 @@ export const site = {
   ],
 
   hero: {
-    eyebrow: "Qinchuan Zhang — XR · AI · Game Developer",
+    eyebrow: "XR · AI · Game Developer",
     title: (
       <>
-        I build immersive
+        Qinchuan
         <br />
-        experiences where
-        <br />
-        <em>XR</em>, <em>AI</em> &amp; <em>play</em> converge
+        Zhang
+      </>
+    ),
+    tagline: (
+      <>
+        I build immersive experiences where <em>XR</em>, <em>AI</em> &amp;{" "}
+        <em>play</em> converge.
       </>
     ),
     cta: { label: "View work", href: "/#work" },

@@ -128,6 +128,15 @@ em {
   letter-spacing: -0.02em;
 }
 
+/* Manifesto line under the name — the name is the headline, this is
+   the pitch. Inherits the global em accent (italic + accent color). */
+.hero__tagline {
+  margin-top: 1.5rem;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  color: #d4d4d8;
+  max-width: 34ch;
+}
+
 .hero__cta {
   pointer-events: auto;
   display: inline-block;
