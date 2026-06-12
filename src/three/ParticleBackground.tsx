@@ -141,9 +141,15 @@ function ResponsiveCamera() {
 /**
  * Sparse, never-morphing explode scatter behind the main cloud — a cheap
  * depth layer for the home page. Same shader, fewer/wider/smaller points.
+ * It spins from both time and scroll, around an axis that slowly precesses
+ * about vertical, so the starfield drifts instead of turning like a disc.
  */
 function AmbientScatter() {
+  const scroll = useScrollProgress();
   const pointsRef = useRef<THREE.Points>(null!);
+  const spin = useRef(0);
+  const precession = useRef(0);
+  const axis = useRef(new THREE.Vector3(0, 1, 0));
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
   const count = useMemo(
     () =>
@@ -177,9 +183,22 @@ function AmbientScatter() {
   }, [count]);
 
   useFrame((_, delta) => {
-    if (!reducedMotion) {
-      pointsRef.current.rotation.y -= delta * AMBIENT_PARTICLES.rotation;
-    }
+    if (reducedMotion) return;
+    // Idle counter-spin plus a scroll-coupled term; the spin axis itself
+    // precesses around vertical at its own slow rate.
+    spin.current -= delta * AMBIENT_PARTICLES.rotation;
+    precession.current += delta * AMBIENT_PARTICLES.axisPrecession;
+    const angle =
+      spin.current + scroll.current * AMBIENT_PARTICLES.scrollRotation;
+    const tilt = AMBIENT_PARTICLES.axisTilt;
+    axis.current
+      .set(
+        Math.sin(precession.current) * tilt,
+        1,
+        Math.cos(precession.current) * tilt
+      )
+      .normalize();
+    pointsRef.current.quaternion.setFromAxisAngle(axis.current, angle);
   });
 
   return (

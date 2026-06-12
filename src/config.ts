@@ -116,11 +116,17 @@ export const AMBIENT_PARTICLES = {
   count: 1200,
   countMobile: 600,
   /** Base point size (same depth/pixel-ratio scaling as the main cloud). */
-  size: 24,
+  size: 120,
   /** Scatter radius multiplier of modelSize — wider than the main explode. */
   spread: 3.6,
   /** Slow counter-rotation, radians/second. */
   rotation: 0.02,
+  /** Extra rotation driven by scrolling, radians over the full page scroll. */
+  scrollRotation: 1.4,
+  /** Tilt of the spin axis away from vertical, radians (0 = pure Y spin). */
+  axisTilt: 0.45,
+  /** How fast the tilted axis precesses around vertical, radians/second. */
+  axisPrecession: 0.05,
 } as const;
 
 export const CAMERA = {
