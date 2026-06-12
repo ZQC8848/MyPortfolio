@@ -10,7 +10,9 @@ export default function Contact() {
         {site.email}
       </a>
       <footer className="contact__footer">
-        <span>© {new Date().getFullYear()}</span>
+        <span>
+          © {new Date().getFullYear()} {site.fullName}
+        </span>
         <span>{contact.footerNote}</span>
       </footer>
     </section>

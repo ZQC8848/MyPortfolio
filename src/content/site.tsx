@@ -248,6 +248,7 @@ export const projects: Project[] = [
 
 export const site = {
   brand: "◆ QIN",
+  fullName: "Qinchuan Zhang",
   email: "qinchuan@usc.edu",
 
   meta: {
@@ -263,7 +264,7 @@ export const site = {
   ],
 
   hero: {
-    eyebrow: "XR · AI · Game Developer",
+    eyebrow: "Qinchuan Zhang — XR · AI · Game Developer",
     title: (
       <>
         I build immersive
