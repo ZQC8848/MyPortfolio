@@ -59,8 +59,14 @@ export interface ShapeKeyframe {
   offset?: readonly [number, number, number];
   /** Overrides `offset` below MOBILE_BREAKPOINT. */
   offsetMobile?: readonly [number, number, number];
-  /** Size multiplier on top of PARTICLES.modelSize (1 = unchanged). */
+  /**
+   * Size multiplier on top of PARTICLES.modelSize (1 = unchanged). Like
+   * `offset`, it's interpolated per-frame at the object level, so resizing
+   * across the breakpoint takes effect instantly.
+   */
   scale?: number;
+  /** Overrides `scale` below MOBILE_BREAKPOINT. */
+  scaleMobile?: number;
 }
 
 /**
@@ -69,10 +75,10 @@ export interface ShapeKeyframe {
  * different orientation/position/size.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
-  { shape: "david", hold: 0.04 },
+  { shape: "david", hold: 0.04 ,scale:0.9},
   { shape: "explode" },
-  { shape: "quest3", anchor: "#about", hold: 0.12, offset: [2, 0, 0] },
-  { shape: "explode" },
+  { shape: "quest3", anchor: "#about", hold: 0.12, offset: [4.5, 3, 0] , scale:0.6 },
+  { shape: "explode", hold:0.12 },
   {
     shape: "rocket",
     hold: 0.08,

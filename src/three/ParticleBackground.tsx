@@ -19,7 +19,6 @@ import { useScrollProgress } from "../lib/ScrollContext";
 import { particleFragmentShader, particleVertexShader } from "./shaders";
 import {
   PointBankLoader,
-  applyKeyframeScale,
   bankToShape,
   explodePositions,
   keyframeQuaternion,
@@ -264,12 +263,11 @@ function Particles({ routeKey }: { routeKey: string }) {
     MODEL_KEYS.forEach((key, i) => {
       bank[key] = bankToShape(loaded[i], count);
     });
-    // Bake per-keyframe scale into the banks; rotation and position offsets
-    // are interpolated per-frame at the group level in useFrame, so they stay
-    // fixed in screen space while the inner points object idle-spins.
-    const seq = SHAPE_KEYFRAMES.map((kf) =>
-      applyKeyframeScale(bank[kf.shape]!, kf)
-    );
+    // Keyframes referencing the same shape share one bank — rotation,
+    // position AND scale offsets are all interpolated per-frame at the
+    // group level in useFrame, so they stay fixed in screen space while
+    // the inner points object idle-spins, and react to viewport changes.
+    const seq = SHAPE_KEYFRAMES.map((kf) => bank[kf.shape]!);
     const quats = SHAPE_KEYFRAMES.map(keyframeQuaternion);
 
     const randoms = new Float32Array(count);
@@ -301,7 +299,7 @@ function Particles({ routeKey }: { routeKey: string }) {
 
   useFrame((state, delta) => {
     if (!timeline.current) return;
-    const { stops, offsets } = timeline.current;
+    const { stops, offsets, scales } = timeline.current;
 
     // Per-frame uniforms, before the scroll early-out (hovering and DPR
     // changes must apply while the page is still). The repulsion ray
@@ -376,6 +374,9 @@ function Particles({ routeKey }: { routeKey: string }) {
       quaternions[k0],
       quaternions[k1],
       t
+    );
+    groupRef.current.scale.setScalar(
+      scales[k0] + (scales[k1] - scales[k0]) * t
     );
 
     const a = shapes[k0];

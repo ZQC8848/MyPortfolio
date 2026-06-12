@@ -74,24 +74,6 @@ export function bankToShape(
   return out;
 }
 
-/**
- * Bake a keyframe's scale into a copy of the shape bank. Rotation and
- * position offsets are NOT baked — they're applied per-frame at the object
- * level (interpolated between keyframes), so they stay fixed in screen space
- * instead of being swung around by the idle Y-spin. Returns the original
- * array untouched when scale is 1, so plain keyframes share memory.
- */
-export function applyKeyframeScale(
-  src: Float32Array,
-  kf: ShapeKeyframe
-): Float32Array {
-  const scale = kf.scale ?? 1;
-  if (scale === 1) return src;
-  const out = new Float32Array(src.length);
-  for (let i = 0; i < src.length; i++) out[i] = src[i] * scale;
-  return out;
-}
-
 /** Keyframe rotation offset as a quaternion (identity when unset). */
 export function keyframeQuaternion(kf: ShapeKeyframe): THREE.Quaternion {
   const q = new THREE.Quaternion();

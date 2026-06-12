@@ -10,6 +10,8 @@ export interface TimelineStop {
 export interface Timeline {
   stops: TimelineStop[];
   offsets: Vec3[];
+  /** Per-keyframe size multiplier (viewport-resolved, like offsets). */
+  scales: number[];
 }
 
 const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
@@ -88,6 +90,9 @@ export function resolveTimeline(): Timeline {
   const offsets = kfs.map<Vec3>(
     (kf) => (mobile ? kf.offsetMobile ?? kf.offset : kf.offset) ?? [0, 0, 0]
   );
+  const scales = kfs.map(
+    (kf) => (mobile ? kf.scaleMobile ?? kf.scale : kf.scale) ?? 1
+  );
   const holds = kfs.map((kf) => kf.hold ?? 0);
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
 
@@ -99,6 +104,7 @@ export function resolveTimeline(): Timeline {
         { at: 1, kf: e },
       ],
       offsets,
+      scales,
     };
   };
 
@@ -123,5 +129,5 @@ export function resolveTimeline(): Timeline {
     measured[i] = clamp01(target / maxScroll);
   }
 
-  return { stops: layoutTimeline(measured, holds), offsets };
+  return { stops: layoutTimeline(measured, holds), offsets, scales };
 }
