@@ -253,7 +253,7 @@ export const site = {
   meta: {
     title: "Qinchuan Zhang — Portfolio",
     description:
-      "Qinchuan (Qin) Zhang — VR & game developer. M.S. Computer Science (Game Development) at USC. Immersive experiences at the edge of virtual and real.",
+      "Qinchuan (Qin) Zhang — XR, AI & game developer. M.S. Computer Science at USC, Research Assistant at Ganek Immersive Studio. Immersive experiences where XR, AI & play converge.",
   },
 
   nav: [
@@ -263,14 +263,14 @@ export const site = {
   ],
 
   hero: {
-    eyebrow: "VR · Game Developer",
+    eyebrow: "XR · AI · Game Developer",
     title: (
       <>
         I build immersive
         <br />
-        experiences at the
+        experiences where
         <br />
-        edge of <em>virtual</em> &amp; <em>real</em>
+        <em>XR</em>, <em>AI</em> &amp; <em>play</em> converge
       </>
     ),
     cta: { label: "View work", href: "/#work" },
@@ -281,23 +281,25 @@ export const site = {
     index: "01 — About",
     lead: (
       <>
-        I&apos;m Qin — an M.S. Computer Science student at USC specializing in
-        game development, building VR, MR, and game experiences from research
-        prototypes to a national museum floor.
+        I&apos;m Qin — an M.S. Computer Science student at USC and Research
+        Assistant at the Ganek Immersive Studio (USC School of Cinematic
+        Arts), where I also collaborate with Dolby on volumetric video
+        playback. I build human-centered immersive systems where XR, AI, and
+        game design meet.
       </>
     ),
     columns: [
       {
-        heading: "What I do",
-        body: "VR/MR/AR development, gameplay engineering, and HCI research — from Gaussian Splatting and haptics to multiplayer systems that hold up outside the lab.",
+        heading: "XR",
+        body: "VR, MR, and AR across Quest 3, Vision Pro, and AR Spectacles — spatial alignment between virtual and real, hand-tracked interaction, haptics research, and multiplayer presence that holds up outside the lab.",
       },
       {
-        heading: "Tools",
-        body: "Unity & C#, Gaussian Splatting, OpenXR / Quest / Vision Pro, networking, shaders, and whatever the prototype actually needs.",
+        heading: "AI",
+        body: "Generative worlds and narrative: Gaussian Splatting world models that restyle real rooms, real-time sign-language recognition, voice-controlled gameplay — and LLM-driven interactive drama in VR as my current research focus.",
       },
       {
-        heading: "Background",
-        body: "M.S. CS (Game Development) at USC, 2025–present. B.E. Digital Media & Technology. Previously Unity Developer Intern at Virtual Origin; Technical Planning at JoyCastle.",
+        heading: "Game",
+        body: "Gameplay engineering and networked multiplayer in Unity and Unreal — spells cast by hand-drawn gestures, football played with foot trackers — built fast at hackathons like MIT Reality Hack and polished for the expo floor.",
       },
     ],
   },
