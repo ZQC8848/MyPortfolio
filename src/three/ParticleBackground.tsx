@@ -7,9 +7,11 @@ import {
   CAMERA,
   MODELS,
   PARTICLES,
+  POINTER_FX,
   SHAPE_KEYFRAMES,
   getDprRange,
   getParticleCount,
+  isHoverPointer,
   isMobileViewport,
   prefersReducedMotion,
 } from "../config";
@@ -119,10 +121,36 @@ function resolveTimeline(): Timeline {
   return { stops, offsets };
 }
 
-/** Pulls the camera back on narrow/portrait viewports so the model fits. */
+/**
+ * Normalized pointer position (-1..1, +y up), tracked on window because the
+ * canvas itself is pointer-events: none. Stays null until the pointer first
+ * moves, and never activates on touch / reduced-motion — so the effects it
+ * drives are simply inert there.
+ */
+function useWindowPointer() {
+  const pointer = useRef<THREE.Vector2 | null>(null);
+  useEffect(() => {
+    if (!isHoverPointer() || prefersReducedMotion()) return;
+    const onMove = (e: PointerEvent) => {
+      (pointer.current ??= new THREE.Vector2()).set(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
+  return pointer;
+}
+
+/**
+ * Pulls the camera back on narrow/portrait viewports so the model fits,
+ * and sways it gently toward the pointer (damped) for a parallax feel.
+ */
 function ResponsiveCamera() {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const size = useThree((s) => s.size);
+  const pointer = useWindowPointer();
 
   useEffect(() => {
     const aspect = size.width / size.height;
@@ -134,6 +162,24 @@ function ResponsiveCamera() {
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
   }, [camera, size]);
+
+  useFrame((_, delta) => {
+    const p = pointer.current;
+    if (!p) return;
+    camera.position.x = THREE.MathUtils.damp(
+      camera.position.x,
+      p.x * POINTER_FX.sway[0],
+      POINTER_FX.swayDamp,
+      delta
+    );
+    camera.position.y = THREE.MathUtils.damp(
+      camera.position.y,
+      CAMERA.height + p.y * POINTER_FX.sway[1],
+      POINTER_FX.swayDamp,
+      delta
+    );
+    camera.lookAt(0, 0, 0);
+  });
 
   return null;
 }
@@ -178,6 +224,12 @@ function AmbientScatter() {
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
+      // Shares the main vertex shader; zero strength keeps the backdrop
+      // indifferent to the pointer.
+      uMouse: { value: MOUSE_PARKED.clone() },
+      uMouseRadius: { value: 0 },
+      uMouseStrength: { value: 0 },
+      uTime: { value: 0 },
     };
     return { geometry: geo, uniforms: u };
   }, [count]);
@@ -215,10 +267,20 @@ function AmbientScatter() {
   );
 }
 
+/** Far-away default so the repulsion term is zero until the pointer moves. */
+const MOUSE_PARKED = new THREE.Vector3(1e6, 1e6, 1e6);
+
 function Particles({ routeKey }: { routeKey: string }) {
   const scroll = useScrollProgress();
+  const pointer = useWindowPointer();
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  const mousePlane = useMemo(
+    () => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0),
+    []
+  );
+  const mouseWorld = useRef(new THREE.Vector3());
   const progress = useRef(0);
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
@@ -279,13 +341,28 @@ function Particles({ routeKey }: { routeKey: string }) {
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
+      uMouse: { value: MOUSE_PARKED.clone() },
+      uMouseRadius: { value: POINTER_FX.repelRadius },
+      uMouseStrength: { value: POINTER_FX.repelStrength },
+      uTime: { value: 0 },
     };
     return { geometry: geo, uniforms: u, shapes: seq, quaternions: quats };
   }, [loaded, count]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     if (!timeline.current) return;
     const { stops, offsets } = timeline.current;
+
+    // Pointer repulsion: project the cursor onto the z=0 plane and hand the
+    // world position to the vertex shader. Runs before the scroll early-out
+    // because hovering must work while the page is still.
+    uniforms.uTime.value += delta;
+    if (pointer.current) {
+      raycaster.setFromCamera(pointer.current, state.camera);
+      if (raycaster.ray.intersectPlane(mousePlane, mouseWorld.current)) {
+        uniforms.uMouse.value.copy(mouseWorld.current);
+      }
+    }
 
     // Idle rotation stays cheap and per-frame; skipped for reduced motion.
     if (!reducedMotion) {

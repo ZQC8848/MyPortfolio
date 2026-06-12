@@ -133,6 +133,28 @@ export const AMBIENT_PARTICLES = {
   axisPrecession: 0.05,
 } as const;
 
+/**
+ * Pointer interaction — only active on hover-capable fine pointers (i.e.
+ * desktop mice, not touch) and disabled under prefers-reduced-motion.
+ * Both effects are near-free: repulsion runs in the vertex shader, sway is
+ * a couple of damped floats per frame.
+ */
+export const POINTER_FX = {
+  /** World-space radius of the repulsion field around the cursor. */
+  repelRadius: 6,
+  /** How far (world units) particles get pushed at the cursor centre. */
+  repelStrength: 4,
+  /** Camera sway amplitude in world units: [horizontal, vertical]. */
+  sway: [1.6, 1.0],
+  /** How quickly the camera chases the pointer (damp lambda). */
+  swayDamp: 2.5,
+} as const;
+
+/** True for devices with a mouse-like pointer (hover + precision). */
+export function isHoverPointer(): boolean {
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
 export const CAMERA = {
   fov: 45,
   height: 4,
