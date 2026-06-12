@@ -9,24 +9,26 @@
 export const MODELS = {
   queen: "/models/Queen.obj",
   pawn: "/models/Pawn.obj",
+  quest3: "/models/meta_quest_3.obj",
 } as const;
 
 export type ShapeName = keyof typeof MODELS | "explode";
 
 /** Shapes the cloud morphs through, top of page → bottom. */
 export const SHAPE_SEQUENCE: readonly ShapeName[] = [
+  "quest3",
   "queen",
   "pawn",
   "explode",
-  "queen",
+  "quest3",
 ];
 
 export const PARTICLES = {
   /** Point count on desktop / small screens. */
-  count: 9000,
-  countMobile: 4500,
+  count: 15000,
+  countMobile: 7000,
   /** Base point size (scaled by depth + pixel ratio in the vertex shader). */
-  size: 26,
+  size: 42,
   /** Models are normalized so their largest dimension equals this. */
   modelSize: 22,
   /** Random-scatter radius multiplier for the "explode" shape. */
@@ -37,6 +39,12 @@ export const PARTICLES = {
   damp: 4,
   /** Idle rotation speed, radians/second. */
   idleRotation: 0.06,
+  /**
+   * Starting Y rotation (radians). A 3/4 view reads much better than a
+   * head-on one for shapes like the headset, whose front-on silhouette
+   * is a low-density blob.
+   */
+  initialRotationY: 0.7,
 } as const;
 
 export const CAMERA = {

@@ -113,7 +113,12 @@ function Particles() {
   });
 
   return (
-    <points ref={pointsRef} geometry={geometry} frustumCulled={false}>
+    <points
+      ref={pointsRef}
+      geometry={geometry}
+      rotation={[0, PARTICLES.initialRotationY, 0]}
+      frustumCulled={false}
+    >
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={particleVertexShader}
