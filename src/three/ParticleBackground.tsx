@@ -4,6 +4,7 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import {
+  AMBIENT_PARTICLES,
   CAMERA,
   MODELS,
   PARTICLES,
@@ -135,6 +136,64 @@ function ResponsiveCamera() {
   }, [camera, size]);
 
   return null;
+}
+
+/**
+ * Sparse, never-morphing explode scatter behind the main cloud — a cheap
+ * depth layer for the home page. Same shader, fewer/wider/smaller points.
+ */
+function AmbientScatter() {
+  const pointsRef = useRef<THREE.Points>(null!);
+  const reducedMotion = useMemo(() => prefersReducedMotion(), []);
+  const count = useMemo(
+    () =>
+      isMobileViewport()
+        ? AMBIENT_PARTICLES.countMobile
+        : AMBIENT_PARTICLES.count,
+    []
+  );
+
+  const { geometry, uniforms } = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      "position",
+      new THREE.BufferAttribute(
+        explodePositions(count, AMBIENT_PARTICLES.spread),
+        3
+      )
+    );
+    const randoms = new Float32Array(count);
+    for (let i = 0; i < count; i++) randoms[i] = Math.random();
+    geo.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
+
+    const u = {
+      uSize: { value: AMBIENT_PARTICLES.size },
+      uSizeRange: { value: new THREE.Vector2(...PARTICLES.sizeRange) },
+      uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      uColorA: { value: new THREE.Color(PARTICLES.colorA) },
+      uColorB: { value: new THREE.Color(PARTICLES.colorB) },
+    };
+    return { geometry: geo, uniforms: u };
+  }, [count]);
+
+  useFrame((_, delta) => {
+    if (!reducedMotion) {
+      pointsRef.current.rotation.y -= delta * AMBIENT_PARTICLES.rotation;
+    }
+  });
+
+  return (
+    <points ref={pointsRef} geometry={geometry} frustumCulled={false}>
+      <shaderMaterial
+        uniforms={uniforms}
+        vertexShader={particleVertexShader}
+        fragmentShader={particleFragmentShader}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
 }
 
 function Particles({ routeKey }: { routeKey: string }) {
@@ -308,6 +367,7 @@ export default function ParticleBackground() {
       >
         <ResponsiveCamera />
         <Particles routeKey={pathname} />
+        {pathname === "/" && <AmbientScatter />}
       </Canvas>
     </div>
   );

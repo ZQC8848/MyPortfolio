@@ -89,7 +89,7 @@ export const PARTICLES = {
    * particle gets a random factor in [min, max]. [1, 1] = uniform points;
    * widen the interval for a more organic, dusty look.
    */
-  sizeRange: [0.6, 1.4],
+  sizeRange: [0.6, 2.4],
   /** Models are normalized so their largest dimension equals this. */
   modelSize: 22,
   /** Random-scatter radius multiplier for the "explode" shape. */
@@ -106,6 +106,21 @@ export const PARTICLES = {
    * is a low-density blob.
    */
   initialRotationY: 0.7,
+} as const;
+
+/**
+ * A second, sparser always-on explode scatter rendered behind the morphing
+ * cloud on the home page — a cheap depth/starfield layer. It never morphs.
+ */
+export const AMBIENT_PARTICLES = {
+  count: 1200,
+  countMobile: 600,
+  /** Base point size (same depth/pixel-ratio scaling as the main cloud). */
+  size: 24,
+  /** Scatter radius multiplier of modelSize — wider than the main explode. */
+  spread: 3.6,
+  /** Slow counter-rotation, radians/second. */
+  rotation: 0.02,
 } as const;
 
 export const CAMERA = {

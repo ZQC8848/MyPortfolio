@@ -127,8 +127,11 @@ export function keyframeQuaternion(kf: ShapeKeyframe): THREE.Quaternion {
 }
 
 /** Procedural random scatter — the "explode" morph target. */
-export function explodePositions(count: number): Float32Array {
-  const spread = PARTICLES.modelSize * PARTICLES.explodeSpread;
+export function explodePositions(
+  count: number,
+  spreadMultiplier: number = PARTICLES.explodeSpread
+): Float32Array {
+  const spread = PARTICLES.modelSize * spreadMultiplier;
   const out = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
     out[i * 3] = (Math.random() - 0.5) * spread;
