@@ -75,9 +75,9 @@ export interface ShapeKeyframe {
  * different orientation/position/size.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
-  { shape: "david", hold: 0.04 ,scale:0.9},
+  { shape: "david", hold: 0.04 ,scale:0.9,scaleMobile:1.5},
   { shape: "explode" },
-  { shape: "quest3", anchor: "#about", hold: 0.12, offset: [4.5, 3, 0] , scale:0.6 },
+  { shape: "quest3", anchor: "#about", hold: 0.12, offset: [4.5, 4, 0] , scale:0.6 ,offsetMobile: [0,0,0] ,scaleMobile:1.2},
   { shape: "explode", hold:0.12 },
   {
     shape: "rocket",
@@ -85,6 +85,7 @@ export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
     offset: [9, 0, 0],
     rotateAxis: [0, 0, 1],
     rotateAngle: -0.32,
+    scaleMobile: 1.5
   },
 ];
 

@@ -18,6 +18,12 @@ function ScrollManager() {
 
   useEffect(() => {
     const lenis = lenisRef.current;
+    // Route changes swap the page content, but Lenis still has the OLD
+    // document height cached and clamps any scrollTo to it (its own
+    // ResizeObserver fires after this effect). Coming back from a page
+    // shorter than the target position would land mid-page — recompute
+    // dimensions first.
+    lenis?.resize();
     if (hash) {
       const el = document.querySelector(hash);
       if (el) {

@@ -112,6 +112,7 @@ Particles.useFrame: damp 阻尼追踪 → 按 timeline.ts 解析出的 stops 定
 - **不要把 `<StrictMode>` 加回 `main.tsx`**。开发模式的双重挂载会让 R3F 在同一 canvas 上 `forceContextLoss()` 且无法恢复,表现为粒子闪现一次后永久白屏。详见 commit `f34e17c`。
 - **`src/three/**` 里每帧改写 geometry buffer 是故意的**(R3F 惯用法,避免每帧分配)。ESLint 的 `react-hooks/purity` / `immutability` 规则只在该目录豁免 —— 不要把豁免范围扩大到 UI 层。
 - **滚动进度只能从 `useScrollProgress()` 拿**,不要再加第二个 `window.addEventListener("scroll")` —— Lenis 与原生滚动的值在动画期间不一致,两套来源必出同步 bug。后续接 GSAP ScrollTrigger 请用 `useLenis()` 拿实例做桥接。
+- **路由切换后调用 `lenis.scrollTo` 前必须先 `lenis.resize()`**(`App.tsx` 的 ScrollManager 已处理):Lenis 缓存的页面高度是上一页的,它的 ResizeObserver 在 effect 之后才触发 —— 从短页面跳回长页面的锚点会被截断在旧高度上(曾导致项目详情页「Back to work」落在半中腰)。
 - **public/ 资源引用必须用绝对路径**(`/models/...`、`/projects/...`)。相对路径在 `/project/:slug` 子路由下会解析错误(曾导致 OBJ 加载 404、粒子背景消失)。
 - **粒子数、prefers-reduced-motion、指针类型只在挂载时读一次**(有意为之):跨 768px 断点拖动窗口不会增减粒子,系统切换 reduced-motion 需刷新页面才生效。改成响应式要重建 geometry,对作品集不值得 —— 这是决定,不是 bug。
 - Windows 下 git 会报 LF→CRLF warning,无害。
