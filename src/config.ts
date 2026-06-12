@@ -15,15 +15,40 @@ export const MODELS = {
 
 export type ShapeName = keyof typeof MODELS | "explode";
 
-/** Shapes the cloud morphs through, top of page → bottom. */
-export const SHAPE_SEQUENCE: readonly ShapeName[] = [
-  "david",
-  "explode",
-  "quest3",
-  "explode",
-  "fightOn",
-  "explode",
-  "rocket",
+/** One stop along the scroll-driven morph. */
+export interface ShapeKeyframe {
+  shape: ShapeName;
+  /**
+   * Scroll progress (0–1) at which the cloud has fully contracted into this
+   * shape. Values must be ascending; use 0 for the first and 1 for the last.
+   * Between two keyframes the cloud is mid-morph.
+   */
+  at: number;
+  /** Rotation offset: axis (auto-normalized) + angle in radians. */
+  rotateAxis?: readonly [number, number, number];
+  rotateAngle?: number;
+  /**
+   * World-space position offset (+x right, +y up). Applied at the object
+   * level, so the idle spin never swings it around.
+   */
+  offset?: readonly [number, number, number];
+  /** Size multiplier on top of PARTICLES.modelSize (1 = unchanged). */
+  scale?: number;
+}
+
+/**
+ * Shapes the cloud morphs through, top of page → bottom.
+ * Offsets are baked per keyframe, so the same model can appear twice with
+ * different orientation/position/size.
+ */
+export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
+  { shape: "david", at: 0 },
+  { shape: "explode", at: 0.17 },
+  { shape: "quest3", at: 0.33 },
+  { shape: "explode", at: 0.5 },
+  { shape: "fightOn", at: 0.67 },
+  { shape: "explode", at: 0.83 },
+  { shape: "rocket", at: 1, offset: [9, 0, 0] },
 ];
 
 export const PARTICLES = {

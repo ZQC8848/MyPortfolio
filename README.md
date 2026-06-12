@@ -64,8 +64,9 @@ public/models/            # meta_quest_3 · David · FightOn · rocket(形变目
 | 加/改作品项目(卡片+详情页+视频) | `src/content/site.tsx` 的 `projects` 数组 |
 | 文案、邮箱、导航 | `src/content/site.tsx` |
 | 粒子数量、颜色、大小、自转速度 | `src/config.ts` → `PARTICLES` |
-| 滚动经过哪些形状、顺序 | `src/config.ts` → `SHAPE_SEQUENCE` |
-| 新增形变模型 | `public/models/` 放 .obj → `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_SEQUENCE` |
+| 滚动经过哪些形状、各自在哪个进度成形 | `src/config.ts` → `SHAPE_KEYFRAMES` 的 `at` 字段 |
+| 单个形状的旋转/位置/大小微调 | `SHAPE_KEYFRAMES` 条目的 `rotateAxis`+`rotateAngle` / `offset` / `scale` |
+| 新增形变模型 | `public/models/` 放 .obj → `config.ts` 的 `MODELS` 注册 → 加进 `SHAPE_KEYFRAMES`(有面网格和纯点云 .obj 都支持) |
 | 相机距离/视角、竖屏适配强度 | `src/config.ts` → `CAMERA` |
 | 移动端粒子数/DPR | `src/config.ts` → `countMobile` / `getDprRange` |
 | 粒子外观(光点形状、渐变) | `src/three/shaders.ts` |
@@ -81,9 +82,11 @@ public/models/            # meta_quest_3 · David · FightOn · rocket(形变目
 Lenis(平滑滚动) ──→ ScrollContext.progress (ref, 0→1)
                               │ 每帧读取(不触发 React 渲染)
                               ▼
-Particles.useFrame: damp 阻尼追踪 → 映射到 SHAPE_SEQUENCE 区间
+Particles.useFrame: damp 阻尼追踪 → 按 SHAPE_KEYFRAMES.at 定位所在区间
                               ▼
-          相邻两形状逐粒子 lerp → 写入 position buffer → GPU
+   相邻两关键帧逐粒子 lerp(旋转/缩放已烘焙;位置偏移在对象层逐帧插值)
+                              ▼
+                  写入 position buffer → GPU
 ```
 
 关键实现点:

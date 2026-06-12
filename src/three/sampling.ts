@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
-import { PARTICLES } from "../config";
+import { PARTICLES, type ShapeKeyframe } from "../config";
 
 /** Scale a geometry so its largest dimension equals `targetSize`, centered at origin. */
 export function normalizeGeometry(
@@ -94,6 +94,38 @@ export function shapeFromObj(obj: THREE.Object3D, count: number): Float32Array {
     return sampleVertices(geo.attributes.position, count);
   }
   throw new Error("OBJ contains no usable geometry (no mesh, points, or lines)");
+}
+
+/**
+ * Bake a keyframe's scale → rotation offsets into a copy of the shape bank.
+ * Position offsets are NOT baked here — they're applied per-frame to the
+ * points object instead, so they stay in world space and the idle Y-spin
+ * doesn't swing them around. Returns the original array untouched when there
+ * is nothing to bake, so plain keyframes share memory.
+ */
+export function applyKeyframeOffsets(
+  src: Float32Array,
+  kf: ShapeKeyframe
+): Float32Array {
+  const scale = kf.scale ?? 1;
+  const angle = kf.rotateAngle ?? 0;
+  const hasRotation = !!kf.rotateAxis && angle !== 0;
+  if (scale === 1 && !hasRotation) return src;
+
+  const q = new THREE.Quaternion();
+  if (hasRotation) {
+    q.setFromAxisAngle(new THREE.Vector3(...kf.rotateAxis!).normalize(), angle);
+  }
+  const out = new Float32Array(src.length);
+  const v = new THREE.Vector3();
+  for (let i = 0; i < src.length; i += 3) {
+    v.set(src[i] * scale, src[i + 1] * scale, src[i + 2] * scale);
+    if (hasRotation) v.applyQuaternion(q);
+    out[i] = v.x;
+    out[i + 1] = v.y;
+    out[i + 2] = v.z;
+  }
+  return out;
 }
 
 /** Procedural random scatter — the "explode" morph target. */
