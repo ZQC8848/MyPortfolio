@@ -244,6 +244,560 @@ export const projects: Project[] = [
       },
     ],
   },
+  {
+    slug: "memoirs-barefoot-doctor",
+    title: "Memoirs of a Barefoot Doctor",
+    tag: "VR Storytelling · Gaussian Splat · 2026",
+    blurb:
+      "An immersive VR walkthrough of 1960s rural China — AI-generated imagery meets spatial memoir.",
+    meta: [
+      { label: "Type", value: "VR Storytelling" },
+      { label: "Stack", value: "Unity · Gaussian Splatting · AI imagery" },
+      { label: "Date", value: "2026 · USC Ganek Expo" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An immersive VR walkthrough of 1960s rural Chinese villages,
+            reconstructing historical scenes with AI-generated imagery and
+            Gaussian Splatting. Shown at the USC Ganek Expo.
+          </>
+        ),
+      },
+      {
+        heading: "Spatial storytelling",
+        body: (
+          <>
+            The project translates a personal memoir into a first-person
+            spatial experience — walking the village instead of reading about
+            it — fostering cross-cultural empathy and historical reflection.
+            Media and full write-up are in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "vr-amblyopia",
+    title: "VR Monocular Amblyopia Experience",
+    tag: "XR · HCI · 2026",
+    blurb:
+      "A VR experience that lets sighted people feel how monocular amblyopia changes everyday perception.",
+    cover: "/projects/vr-amblyopia.png",
+    meta: [
+      { label: "Type", value: "XR · HCI" },
+      { label: "Date", value: "2026" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A VR empathy experience simulating how monocular amblyopia
+            (lazy eye) alters depth, contrast, and everyday perception —
+            built to make an invisible condition tangible for sighted users.
+            Full write-up and demo video are in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "vr-soccer",
+    title: "Foot-Tracked Multiplayer VR Soccer",
+    tag: "MIT Reality Hack · XR · AI · 2026",
+    blurb:
+      "Foot-tracked, voice-controlled VR football for players with upper-limb disabilities.",
+    cover: "/projects/vr-soccer.jpeg",
+    video: { type: "vimeo", id: "1158527428" },
+    meta: [
+      { label: "Type", value: "Accessibility · XR · Game" },
+      { label: "Stack", value: "Unity · IMU sensors · UDP · Gemini" },
+      { label: "Date", value: "Jan 2026 · MIT Reality Hack" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A VR football game designed for players with upper-limb
+            disabilities, built at MIT Reality Hack: you kick with your real
+            feet via IMU-based foot sensors and run the rest of the game with
+            your voice. Hands never required.
+          </>
+        ),
+      },
+      {
+        heading: "Hardware & networking",
+        body: (
+          <>
+            Real-time UDP networking bridges the foot-tracking hardware into
+            Unity, and cross-platform multiplayer lets VR players share a
+            match with players on flat PCs.
+          </>
+        ),
+      },
+      {
+        heading: "AI voice control",
+        body: (
+          <>
+            Gemini maps natural-language commands to gameplay actions —
+            switching, passing, tactics — so the voice channel acts as a
+            full input device rather than a menu shortcut.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "vr-haptic-research",
+    title: "Vibrotactile Texture Perception in VR",
+    tag: "Haptics Research · XR · 2026",
+    blurb:
+      "User study on vibrotactile texture perception — can rumble alone teach your fingers a texture?",
+    cover: "/projects/vr-haptic-research.jpeg",
+    video: { type: "vimeo", id: "1158598193" },
+    meta: [
+      { label: "Type", value: "Research · Haptics" },
+      { label: "Stack", value: "Quest 3 · Meta Haptic Studio" },
+      { label: "Date", value: "2026 · ongoing" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An ongoing user study (sole author, advised by Prof. Heather
+            Culbertson) on how people recognize textures rendered purely as
+            controller vibration in VR — comparing absolute identification
+            against relative discrimination.
+          </>
+        ),
+      },
+      {
+        heading: "Method",
+        body: (
+          <>
+            Haptic stimuli are authored in Meta Haptic Studio and paired with
+            auditory feedback across three experimental conditions, varying
+            how participants are tactilely grounded before each judgment.
+          </>
+        ),
+      },
+      {
+        heading: "Current work",
+        body: (
+          <>
+            Analyzing recognition accuracy and confidence ratings across
+            grounding phases; results are being prepared for publication.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "convis",
+    title: "Convis: Drosophila Neuron Visualization",
+    tag: "Three.js · Visualization · 2025",
+    blurb:
+      "Web-based 3D visualization of fruit-fly neuron morphology for neuroscience teams.",
+    meta: [
+      { label: "Type", value: "Scientific Visualization" },
+      { label: "Stack", value: "Three.js · Web" },
+      { label: "Date", value: "2025 · ongoing" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An interactive web-based 3D tool for exploring the structural
+            morphology of fruit-fly (Drosophila) neurons, built with Three.js
+            to support neuroscience teams working with fly-brain data.
+          </>
+        ),
+      },
+      {
+        heading: "Rendering at scale",
+        body: (
+          <>
+            Batch rendering keeps large neuron datasets interactive, with
+            real-time controls for filtering and inspecting individual
+            structures. Screenshots and a public demo are in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "vision-pro-interaction",
+    title: "Vision Pro Interaction",
+    tag: "XR · Vision Pro · 2025",
+    blurb: "Interaction experiments on Apple Vision Pro.",
+    meta: [
+      { label: "Type", value: "XR Prototype" },
+      { label: "Date", value: "Nov 2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            Interaction prototyping on Apple Vision Pro. Full write-up and
+            media are in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "earth-shader",
+    title: "Earth — Graphic Shader Computing",
+    tag: "Computer Graphics · 2025",
+    blurb:
+      "Rendering Earth from scratch — a C++ ray-tracing and shader computing study.",
+    cover: "/projects/earth-shader.jpeg",
+    video: { type: "vimeo", id: "1158597091" },
+    meta: [
+      { label: "Type", value: "Computer Graphics" },
+      { label: "Stack", value: "C++ · Ray Tracing · Shaders" },
+      { label: "Date", value: "2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A computer-graphics study rendering the Earth with hand-written
+            shading and a C++ ray tracer — atmosphere, terrain, and lighting
+            computed from first principles rather than engine defaults. The
+            demo video shows the result; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "mr-multiplayer-sync",
+    title: "Multiplayer Position Sync in MR",
+    tag: "MR · Networking · 2025",
+    blurb:
+      "Keeping multiple headsets spatially aligned in one shared mixed-reality scene.",
+    cover: "/projects/mr-multiplayer-sync.png",
+    video: { type: "youtube", id: "c415SjI9Jyc" },
+    meta: [
+      { label: "Type", value: "MR · Networking" },
+      { label: "Date", value: "Jun 2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A technical prototype for synchronizing player positions across
+            headsets inside a shared mixed-reality scene, so every
+            participant sees everyone else exactly where they physically
+            stand. Demo in the video; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "mr-wall-broken",
+    title: "MR Wall Broken",
+    tag: "MR · Quest 3 · 2025",
+    blurb:
+      "Breaking through your real wall in mixed reality — a portal illusion on scene understanding.",
+    cover: "/projects/mr-wall-broken.png",
+    video: { type: "youtube", id: "IE5WVtWit7g" },
+    meta: [
+      { label: "Type", value: "MR Prototype" },
+      { label: "Date", value: "Jun 2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A mixed-reality effect that visually breaks open the user&apos;s
+            real wall, using scene understanding to anchor the illusion to
+            actual room geometry. Demo in the video; full write-up is in
+            progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "mr-museum-exhibition",
+    title: "MR Exhibition at the National Museum of China",
+    tag: "MR · Exhibition · 2025",
+    blurb:
+      "A mixed-reality exhibition piece deployed on the floor of the National Museum of China.",
+    cover: "/projects/mr-museum-exhibition.png",
+    video: { type: "youtube", id: "3ph0hPi-SoU" },
+    meta: [
+      { label: "Type", value: "MR · Production Exhibition" },
+      { label: "Date", value: "May 2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A mixed-reality exhibition piece that shipped to a real audience
+            on the floor of the National Museum of China — XR built to
+            production standards: reliable tracking, unattended operation,
+            and visitors who have never worn a headset before.
+          </>
+        ),
+      },
+      {
+        heading: "More coming",
+        body: (
+          <>
+            The demo video shows the piece in place; a fuller write-up of the
+            production process is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "tunnel-race",
+    title: "Tunnel Race",
+    tag: "Game · 2025",
+    blurb: "A high-speed tunnel racing game.",
+    cover: "/projects/tunnel-race.png",
+    video: { type: "youtube", id: "QmCvQrmr-aY" },
+    meta: [
+      { label: "Type", value: "Game" },
+      { label: "Date", value: "Mar 2025" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A high-speed tunnel racing game. Gameplay in the video; full
+            write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "endless-ads",
+    title: "Endless ADs",
+    tag: "Game · 2024",
+    blurb: "A game built around an endless stream of advertising.",
+    cover: "/projects/endless-ads.png",
+    video: { type: "youtube", id: "Nq3X7G9g3uU" },
+    meta: [
+      { label: "Type", value: "Game" },
+      { label: "Date", value: "Dec 2024" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A game built around an endless stream of advertising. Gameplay in
+            the video; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "angry-bird-ar",
+    title: "Angry Bird AR",
+    tag: "AR · Game · 2024",
+    blurb:
+      "The slingshot classic reimagined in AR — flinging birds across your real room.",
+    cover: "/projects/angry-bird-ar.png",
+    video: { type: "youtube", id: "8Url9hC_uVM" },
+    meta: [
+      { label: "Type", value: "AR · Game" },
+      { label: "Date", value: "Jun 2024" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A slingshot physics game played in augmented reality, with the
+            real room as the level. Demo in the video; full write-up is in
+            progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "pig-fighting",
+    title: "Pig Fighting",
+    tag: "Game · Networking · 2024",
+    blurb: "Cross-platform multiplayer battles.",
+    cover: "/projects/pig-fighting.png",
+    video: { type: "youtube", id: "cwuW3c-GSVw" },
+    meta: [
+      { label: "Type", value: "Game · Multiplayer" },
+      { label: "Date", value: "Jun 2024" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            Cross-platform multiplayer battles. Gameplay in the video; full
+            write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "chinese-abats-vr-teaching",
+    title: "Chinese Abats VR Teaching",
+    tag: "VR · Education · 2024",
+    blurb: "A VR teaching experience for traditional Chinese craft.",
+    cover: "/projects/chinese-abats-vr-teaching.png",
+    video: { type: "youtube", id: "xO3TpVAirQM" },
+    meta: [
+      { label: "Type", value: "VR · Education" },
+      { label: "Date", value: "Jun 2024" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A VR teaching experience built around traditional Chinese
+            culture. Demo in the video; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "end-life",
+    title: "END LIFE",
+    tag: "Game · 2023",
+    blurb: "A student game project — gameplay in the video.",
+    cover: "/projects/end-life.png",
+    video: { type: "youtube", id: "dALuE3sxA5E" },
+    meta: [
+      { label: "Type", value: "Game" },
+      { label: "Date", value: "May 2023" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A student game project. Gameplay in the video; full write-up is
+            in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "virtual-simulation-lab",
+    title: "Virtual Simulation Laboratory",
+    tag: "XR · Education · 2023",
+    blurb: "A virtual laboratory for hands-on experiments in VR.",
+    cover: "/projects/virtual-simulation-lab.png",
+    video: { type: "youtube", id: "7vIcb-CrOew" },
+    meta: [
+      { label: "Type", value: "VR · Education" },
+      { label: "Date", value: "Feb 2023" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            A virtual simulation laboratory for hands-on experiments in VR.
+            Demo in the video; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "block-splicing",
+    title: "Block Splicing",
+    tag: "XR · 2022",
+    blurb: "An XR block-assembly prototype.",
+    cover: "/projects/block-splicing.png",
+    video: { type: "youtube", id: "zqs3yucy0R0" },
+    meta: [
+      { label: "Type", value: "XR Prototype" },
+      { label: "Date", value: "Nov 2022" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An XR prototype about assembling and splicing blocks in space.
+            Demo in the video; full write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "botanical-souls",
+    title: "Botanical Souls",
+    tag: "XR · Game · 2022",
+    blurb: "An XR game about plants — demo in the video.",
+    cover: "/projects/botanical-souls.png",
+    video: { type: "youtube", id: "TqByPmXqC4M" },
+    meta: [
+      { label: "Type", value: "XR · Game" },
+      { label: "Date", value: "Nov 2022" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An XR game project themed around botany. Demo in the video; full
+            write-up is in progress.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "air-war",
+    title: "AIR War",
+    tag: "Game · 2022",
+    blurb: "An aerial combat game.",
+    cover: "/projects/air-war.png",
+    video: { type: "youtube", id: "G3tSm1iuBDw" },
+    meta: [
+      { label: "Type", value: "Game" },
+      { label: "Date", value: "Aug 2022" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An aerial combat game. Gameplay in the video; full write-up is in
+            progress.
+          </>
+        ),
+      },
+    ],
+  },
 ];
 
 export const site = {
