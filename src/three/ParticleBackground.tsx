@@ -195,6 +195,9 @@ function Particles({ routeKey }: { routeKey: string }) {
 
     const u = {
       uSize: { value: PARTICLES.size },
+      uSizeRange: {
+        value: new THREE.Vector2(...PARTICLES.sizeRange),
+      },
       uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },

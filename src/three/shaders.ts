@@ -1,5 +1,6 @@
 export const particleVertexShader = /* glsl */ `
   uniform float uSize;
+  uniform vec2 uSizeRange;
   uniform float uPixelRatio;
   attribute float aRandom;
   varying float vRandom;
@@ -8,7 +9,8 @@ export const particleVertexShader = /* glsl */ `
     vRandom = aRandom;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = uSize * (0.6 + aRandom * 0.8) * uPixelRatio * (1.0 / -mv.z);
+    gl_PointSize = uSize * mix(uSizeRange.x, uSizeRange.y, aRandom)
+      * uPixelRatio * (1.0 / -mv.z);
   }
 `;
 

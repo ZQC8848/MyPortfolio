@@ -65,7 +65,7 @@ export interface ShapeKeyframe {
  * different orientation/position/size.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
-  { shape: "david", hold: 0.08 },
+  { shape: "david", hold: 0.04 },
   { shape: "explode" },
   { shape: "quest3", anchor: "#about", hold: 0.12, offset: [2, 0, 0] },
   { shape: "explode" },
@@ -84,6 +84,12 @@ export const PARTICLES = {
   countMobile: 7000,
   /** Base point size (scaled by depth + pixel ratio in the vertex shader). */
   size: 42,
+  /**
+   * Per-particle random size interval, as multipliers of `size`: each
+   * particle gets a random factor in [min, max]. [1, 1] = uniform points;
+   * widen the interval for a more organic, dusty look.
+   */
+  sizeRange: [0.6, 1.4],
   /** Models are normalized so their largest dimension equals this. */
   modelSize: 22,
   /** Random-scatter radius multiplier for the "explode" shape. */
