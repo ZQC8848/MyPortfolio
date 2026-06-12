@@ -9,6 +9,7 @@ import {
   SHAPE_KEYFRAMES,
   getDprRange,
   getParticleCount,
+  isMobileViewport,
   prefersReducedMotion,
 } from "../config";
 import { useScrollProgress } from "../lib/ScrollContext";
@@ -22,6 +23,59 @@ import {
 
 const MODEL_KEYS = Object.keys(MODELS) as (keyof typeof MODELS)[];
 const MODEL_PATHS = MODEL_KEYS.map((k) => MODELS[k]);
+
+type Vec3 = readonly [number, number, number];
+
+/**
+ * Resolve each keyframe's scroll progress and position offset for the
+ * CURRENT layout. Anchored keyframes are measured from their element's real
+ * document position (so they track the section across any viewport width);
+ * keyframes with neither anchor nor `at` get the midpoint between their
+ * resolved neighbours. Called on mount and again whenever the page resizes
+ * or its content height changes.
+ */
+function resolveTimeline(): { ats: number[]; offsets: Vec3[] } {
+  const maxScroll =
+    document.documentElement.scrollHeight - window.innerHeight;
+
+  const ats: (number | null)[] = SHAPE_KEYFRAMES.map((kf) => {
+    if (kf.anchor && maxScroll > 0) {
+      const el = document.querySelector(kf.anchor);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        const target = top - (kf.anchorViewport ?? 0.1) * window.innerHeight;
+        return THREE.MathUtils.clamp(target / maxScroll, 0, 1);
+      }
+    }
+    return kf.at ?? null;
+  });
+
+  // Endpoints default to the page edges; gaps become evenly spaced stops
+  // between the nearest resolved neighbours.
+  if (ats[0] === null) ats[0] = 0;
+  if (ats[ats.length - 1] === null) ats[ats.length - 1] = 1;
+  for (let i = 1; i < ats.length - 1; i++) {
+    if (ats[i] !== null) continue;
+    let j = i + 1;
+    while (ats[j] === null) j++;
+    const a = ats[i - 1]!;
+    const b = ats[j]!;
+    for (let k = i; k < j; k++) {
+      ats[k] = a + ((b - a) * (k - i + 1)) / (j - i + 1);
+    }
+  }
+  // Keep the timeline strictly ascending even if an anchor lands out of order.
+  const resolved = ats as number[];
+  for (let i = 1; i < resolved.length; i++) {
+    resolved[i] = Math.max(resolved[i], resolved[i - 1] + 1e-3);
+  }
+
+  const mobile = isMobileViewport();
+  const offsets = SHAPE_KEYFRAMES.map<Vec3>(
+    (kf) => (mobile ? kf.offsetMobile ?? kf.offset : kf.offset) ?? [0, 0, 0]
+  );
+  return { ats: resolved, offsets };
+}
 
 /** Pulls the camera back on narrow/portrait viewports so the model fits. */
 function ResponsiveCamera() {
@@ -50,10 +104,29 @@ function Particles() {
   const lastWritten = useRef(-1);
   const reducedMotion = useMemo(() => prefersReducedMotion(), []);
   const count = useMemo(() => getParticleCount(), []);
+  const timeline = useRef<ReturnType<typeof resolveTimeline> | null>(null);
 
   const loaded = useLoader(OBJLoader, MODEL_PATHS);
 
-  const { geometry, uniforms, shapes, offsets, quaternions } = useMemo(() => {
+  // Measure anchored keyframes against the live layout, and re-measure when
+  // the viewport or the document height changes (resize, images loading,
+  // route switches) — this is what keeps the sync correct on mobile widths.
+  useEffect(() => {
+    const update = () => {
+      timeline.current = resolveTimeline();
+      lastWritten.current = -1; // force a rewrite with the new timing
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(document.body);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const { geometry, uniforms, shapes, quaternions } = useMemo(() => {
     const bank: Partial<Record<string, Float32Array>> = {
       explode: explodePositions(count),
     };
@@ -66,7 +139,6 @@ function Particles() {
     const seq = SHAPE_KEYFRAMES.map((kf) =>
       applyKeyframeScale(bank[kf.shape]!, kf)
     );
-    const offs = SHAPE_KEYFRAMES.map((kf) => kf.offset ?? [0, 0, 0]);
     const quats = SHAPE_KEYFRAMES.map(keyframeQuaternion);
 
     const randoms = new Float32Array(count);
@@ -85,16 +157,13 @@ function Particles() {
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
     };
-    return {
-      geometry: geo,
-      uniforms: u,
-      shapes: seq,
-      offsets: offs,
-      quaternions: quats,
-    };
+    return { geometry: geo, uniforms: u, shapes: seq, quaternions: quats };
   }, [loaded, count]);
 
   useFrame((_, delta) => {
+    if (!timeline.current) return;
+    const { ats, offsets } = timeline.current;
+
     // Idle rotation stays cheap and per-frame; skipped for reduced motion.
     if (!reducedMotion) {
       pointsRef.current.rotation.y += delta * PARTICLES.idleRotation;
@@ -109,18 +178,18 @@ function Particles() {
     if (Math.abs(progress.current - lastWritten.current) < 1e-4) return;
     lastWritten.current = progress.current;
 
-    // Find the keyframe segment containing the current progress (the `at`
-    // values are ascending), then lerp the two neighbouring banks.
+    // Find the keyframe segment containing the current progress (the
+    // resolved timings are ascending), then lerp the two neighbouring banks.
     const f = THREE.MathUtils.clamp(progress.current, 0, 1);
     let i0 = 0;
-    for (let i = SHAPE_KEYFRAMES.length - 2; i >= 0; i--) {
-      if (f >= SHAPE_KEYFRAMES[i].at) {
+    for (let i = ats.length - 2; i >= 0; i--) {
+      if (f >= ats[i]) {
         i0 = i;
         break;
       }
     }
-    const a0 = SHAPE_KEYFRAMES[i0].at;
-    const a1 = SHAPE_KEYFRAMES[i0 + 1].at;
+    const a0 = ats[i0];
+    const a1 = ats[i0 + 1];
     const t = THREE.MathUtils.smoothstep(
       a1 > a0 ? (f - a0) / (a1 - a0) : 1,
       0,

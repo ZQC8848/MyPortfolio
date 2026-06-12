@@ -20,10 +20,25 @@ export interface ShapeKeyframe {
   shape: ShapeName;
   /**
    * Scroll progress (0–1) at which the cloud has fully contracted into this
-   * shape. Values must be ascending; use 0 for the first and 1 for the last.
-   * Between two keyframes the cloud is mid-morph.
+   * shape. Prefer `anchor` for shapes that must sync with a page section —
+   * fixed fractions only hold for one layout, and section positions shift
+   * with viewport width. Omit entirely (e.g. on "explode" fillers) to get
+   * the midpoint between the neighbouring keyframes.
    */
-  at: number;
+  at?: number;
+  /**
+   * CSS selector of the section this shape syncs to (e.g. "#about"). The
+   * actual progress is measured from the element's real position and
+   * re-measured on resize, so it stays correct on any viewport. When the
+   * element is missing (other routes), `at` is used as fallback.
+   */
+  anchor?: string;
+  /**
+   * Where the anchored element's top edge sits (as a fraction of viewport
+   * height, 0 = top) at the moment the shape is fully formed. Default 0.1 —
+   * "section heading just arrived at the top of the screen".
+   */
+  anchorViewport?: number;
   /**
    * Rotation offset: axis (auto-normalized) + angle in radians. Applied in
    * screen space on top of the idle spin, so e.g. a Z-axis tilt stays a
@@ -36,6 +51,8 @@ export interface ShapeKeyframe {
    * level, so the idle spin never swings it around.
    */
   offset?: readonly [number, number, number];
+  /** Overrides `offset` below MOBILE_BREAKPOINT. */
+  offsetMobile?: readonly [number, number, number];
   /** Size multiplier on top of PARTICLES.modelSize (1 = unchanged). */
   scale?: number;
 }
@@ -47,9 +64,9 @@ export interface ShapeKeyframe {
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
   { shape: "david", at: 0 },
-  { shape: "explode", at: 0.17 },
-  { shape: "quest3", at: 0.4 ,offset: [2, 0, 0] },
-  { shape: "explode", at: 0.5 },
+  { shape: "explode" },
+  { shape: "quest3", anchor: "#about", at: 0.4, offset: [2, 0, 0] },
+  { shape: "explode" },
   {
     shape: "rocket",
     at: 1,
