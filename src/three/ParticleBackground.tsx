@@ -9,8 +9,10 @@ import {
   PARTICLES,
   POINTER_FX,
   SHAPE_KEYFRAMES,
+  getAmbientSize,
   getDprRange,
   getParticleCount,
+  getParticleSize,
   isHoverPointer,
   isMobileViewport,
   prefersReducedMotion,
@@ -183,7 +185,7 @@ function AmbientScatter() {
     geo.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
 
     const u = {
-      uSize: { value: AMBIENT_PARTICLES.size },
+      uSize: { value: getAmbientSize() },
       uSizeRange: { value: new THREE.Vector2(...PARTICLES.sizeRange) },
       uPixelRatio: { value: 1 }, // synced per-frame to the real renderer DPR
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
@@ -291,7 +293,7 @@ function Particles({ routeKey }: { routeKey: string }) {
     geo.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
 
     const u = {
-      uSize: { value: PARTICLES.size },
+      uSize: { value: getParticleSize() },
       uSizeRange: {
         value: new THREE.Vector2(...PARTICLES.sizeRange),
       },

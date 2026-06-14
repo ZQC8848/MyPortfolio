@@ -112,6 +112,12 @@ export const PARTICLES = {
   /** Base point size (scaled by depth + pixel ratio in the vertex shader). */
   size: 42,
   /**
+   * Multiplier on `size` below MOBILE_BREAKPOINT. Phones run far fewer,
+   * more spread-out points, so bumping this keeps the cloud reading as a
+   * solid shape instead of a thin sprinkle. 1 = same as desktop.
+   */
+  sizeMobileScale: 5,
+  /**
    * Per-particle random size interval, as multipliers of `size`: each
    * particle gets a random factor in [min, max]. [1, 1] = uniform points;
    * widen the interval for a more organic, dusty look.
@@ -157,6 +163,11 @@ export const AMBIENT_PARTICLES = {
   countMobile: 600,
   /** Base point size (same depth/pixel-ratio scaling as the main cloud). */
   size: 120,
+  /**
+   * Multiplier on `size` below MOBILE_BREAKPOINT, like PARTICLES.sizeMobileScale
+   * but for the background starfield. 1 = same as desktop.
+   */
+  sizeMobileScale: 3,
   /** Scatter radius multiplier of modelSize — wider than the main explode. */
   spread: 3.6,
   /** Slow counter-rotation, radians/second. */
@@ -217,6 +228,18 @@ export function isMobileViewport(): boolean {
 
 export function getParticleCount(): number {
   return isMobileViewport() ? PARTICLES.countMobile : PARTICLES.count;
+}
+
+export function getParticleSize(): number {
+  return isMobileViewport()
+    ? PARTICLES.size * PARTICLES.sizeMobileScale
+    : PARTICLES.size;
+}
+
+export function getAmbientSize(): number {
+  return isMobileViewport()
+    ? AMBIENT_PARTICLES.size * AMBIENT_PARTICLES.sizeMobileScale
+    : AMBIENT_PARTICLES.size;
 }
 
 /** Cap device pixel ratio harder on mobile GPUs. */
