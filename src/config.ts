@@ -67,12 +67,27 @@ export interface ShapeKeyframe {
   scale?: number;
   /** Overrides `scale` below MOBILE_BREAKPOINT. */
   scaleMobile?: number;
+  /**
+   * Centre of the idle swing for THIS shape (radians of Y rotation) — i.e.
+   * the orientation the model rests at. Interpolated between neighbouring
+   * keyframes per frame, so each model can face its own direction. Omit to
+   * inherit PARTICLES.initialRotationY.
+   */
+  initialRotationY?: number;
+  /**
+   * Idle-swing amplitude for THIS shape (radians to EACH side of its
+   * centre). Also interpolated between neighbours. 0 = this model holds
+   * still. Omit to inherit PARTICLES.swingAmplitude.
+   */
+  swingAmplitude?: number;
 }
 
 /**
  * Shapes the cloud morphs through, top of page → bottom.
  * Offsets are baked per keyframe, so the same model can appear twice with
- * different orientation/position/size.
+ * different orientation/position/size. Each shape can also set its own idle
+ * swing via `initialRotationY` (resting angle) and `swingAmplitude` (how far
+ * it rocks); omit either to inherit the PARTICLES defaults.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
   { shape: "david", hold: 0.04 ,scale:0.9,scaleMobile:1.5},
@@ -85,7 +100,8 @@ export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
     offset: [9, 0, 0],
     rotateAxis: [0, 0, 1],
     rotateAngle: -0.32,
-    scaleMobile: 1.5
+    scaleMobile: 1.5,
+    initialRotationY: 0,
   },
 ];
 
@@ -129,7 +145,7 @@ export const PARTICLES = {
    * much better than a head-on one for shapes like the headset, whose
    * front-on silhouette is a low-density blob.
    */
-  initialRotationY: 0.5,
+  initialRotationY: 0.2,
 } as const;
 
 /**

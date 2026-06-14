@@ -28,6 +28,16 @@ import { resolveTimeline, type Timeline } from "./timeline";
 const MODEL_KEYS = Object.keys(MODELS) as (keyof typeof MODELS)[];
 const MODEL_PATHS = MODEL_KEYS.map((k) => MODELS[k]);
 
+// Per-keyframe idle-swing parameters, resolved once with the global defaults
+// filled in. Interpolated between neighbouring keyframes per frame (below),
+// so each shape can rest at its own angle and rock by its own amount.
+const SWING_CENTERS = SHAPE_KEYFRAMES.map(
+  (kf) => kf.initialRotationY ?? PARTICLES.initialRotationY
+);
+const SWING_AMPLITUDES = SHAPE_KEYFRAMES.map(
+  (kf) => kf.swingAmplitude ?? PARTICLES.swingAmplitude
+);
+
 /**
  * Normalized pointer position (-1..1, +y up), tracked on window because the
  * canvas itself is pointer-events: none. Module-level singleton: one
@@ -349,11 +359,19 @@ function Particles({ routeKey }: { routeKey: string }) {
         spin.current -= Math.round(spin.current / (2 * Math.PI)) * 2 * Math.PI;
         spin.current = THREE.MathUtils.damp(spin.current, 0, 4 * (1 - e), delta);
       }
+      // Swing centre and amplitude are per-keyframe; blend the two ends of
+      // the current segment so each model rests at — and rocks by — its own
+      // configured amount, transitioning smoothly across a morph.
+      const center =
+        SWING_CENTERS[k0] + (SWING_CENTERS[k1] - SWING_CENTERS[k0]) * t;
+      const amplitude =
+        SWING_AMPLITUDES[k0] +
+        (SWING_AMPLITUDES[k1] - SWING_AMPLITUDES[k0]) * t;
       pointsRef.current.rotation.y =
-        PARTICLES.initialRotationY +
+        center +
         spin.current +
         Math.sin((swingTime.current * Math.PI * 2) / PARTICLES.swingPeriod) *
-          PARTICLES.swingAmplitude *
+          amplitude *
           (1 - e);
     }
 
@@ -393,7 +411,7 @@ function Particles({ routeKey }: { routeKey: string }) {
       <points
         ref={pointsRef}
         geometry={geometry}
-        rotation={[0, PARTICLES.initialRotationY, 0]}
+        rotation={[0, SWING_CENTERS[0], 0]}
         frustumCulled={false}
       >
         <shaderMaterial
