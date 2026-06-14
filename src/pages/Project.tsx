@@ -1,16 +1,23 @@
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { projects, type ProjectVideo } from "../content/site";
 
+function embedSrc(video: ProjectVideo): string {
+  switch (video.type) {
+    case "youtube":
+      return `https://www.youtube.com/embed/${video.id}`;
+    case "vimeo":
+      return `https://player.vimeo.com/video/${video.id}`;
+    case "slides":
+      return `https://docs.google.com/presentation/d/${video.id}/embed`;
+  }
+}
+
 function VideoEmbed({ video, title }: { video: ProjectVideo; title: string }) {
-  const src =
-    video.type === "youtube"
-      ? `https://www.youtube.com/embed/${video.id}`
-      : `https://player.vimeo.com/video/${video.id}`;
   return (
     <div className="project__video">
       <iframe
-        src={src}
-        title={`${title} — video`}
+        src={embedSrc(video)}
+        title={`${title} — ${video.type === "slides" ? "slides" : "video"}`}
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
         loading="lazy"
@@ -21,14 +28,21 @@ function VideoEmbed({ video, title }: { video: ProjectVideo; title: string }) {
 
 export default function Project() {
   const { slug } = useParams();
+  const location = useLocation();
   const project = projects.find((p) => p.slug === slug);
 
   if (!project) return <Navigate to="/" replace />;
 
+  // Return to whichever section the visitor came from, so the home page
+  // scrolls back to (and re-reveals) the list they were browsing.
+  const from = (location.state as { from?: string } | null)?.from;
+  const backHash = from === "archive" ? "/#archive" : "/#work";
+  const backLabel = from === "archive" ? "← Back to archive" : "← Back to work";
+
   return (
     <article className="project">
-      <Link className="project__back" to="/#work">
-        ← Back to work
+      <Link className="project__back" to={backHash}>
+        {backLabel}
       </Link>
 
       <header className="project__head">
@@ -67,12 +81,22 @@ export default function Project() {
                 <figcaption>{s.image.caption}</figcaption>
               </figure>
             )}
+            {s.images && (
+              <div className="project__gallery">
+                {s.images.map((img) => (
+                  <figure key={img.src}>
+                    <img src={img.src} alt={img.caption} loading="lazy" />
+                    <figcaption>{img.caption}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
           </section>
         ))}
       </div>
 
       <footer className="project__footer">
-        <Link to="/#work">← All projects</Link>
+        <Link to={backHash}>← All projects</Link>
       </footer>
     </article>
   );

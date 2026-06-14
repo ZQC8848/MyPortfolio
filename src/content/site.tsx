@@ -9,14 +9,22 @@ import type { ReactNode } from "react";
  */
 
 export interface ProjectVideo {
-  type: "youtube" | "vimeo";
+  type: "youtube" | "vimeo" | "slides";
   id: string;
+}
+
+export interface ProjectImage {
+  src: string;
+  caption: string;
 }
 
 export interface ProjectSection {
   heading: string;
   body: ReactNode;
-  image?: { src: string; caption: string };
+  /** Single figure under the section body. */
+  image?: ProjectImage;
+  /** Two-or-more figures laid out side by side (e.g. a character lineup). */
+  images?: ProjectImage[];
 }
 
 export interface Project {
@@ -47,6 +55,7 @@ export const projects: Project[] = [
     cover: "/projects/syncscape.png",
     video: { type: "vimeo", id: "1168772748" },
     meta: [
+      { label: "Team", value: "Qinchuan Zhang · Weibo Xu" },
       { label: "Type", value: "Research · XR" },
       { label: "Stack", value: "Quest 3 · Unity MRUK · WorldLabs · Open3D" },
       { label: "Date", value: "2026" },
@@ -125,59 +134,119 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "handspeaker",
+    slug: "facade-vr",
     featured: true,
-    title: "HandSpeaker",
-    tag: "HCI · ML · Hardware · XR",
+    title: "Facade VR",
+    tag: "AI Narrative · VR · In Development",
     blurb:
-      "Real-time sign language translation on AR glasses — understanding motion as language.",
-    cover: "/projects/handspeaker.png",
-    video: { type: "youtube", id: "TrCdpxfqvkI" },
+      "Reimagining the classic interactive drama Façade with LLMs and embodied VR input.",
+    cover: "/projects/Facade/FacadeVR.png",
+    video: { type: "slides", id: "1sTbBGU0PDYkJOl3BOyUQpD7nso6j3ohi" },
     meta: [
-      { label: "Type", value: "Research · HCI" },
-      { label: "Stack", value: "AR Spectacles · Hand Tracking · WebSocket" },
-      { label: "Focus", value: "Spatiotemporal gesture understanding" },
+      { label: "Team", value: "Qinchuan Zhang · Biying Zeng" },
+      { label: "Type", value: "Research · AI Narrative" },
+      { label: "Focus", value: "LLM drama management · embodied input" },
+      { label: "Status", value: "In development · 2026" },
     ],
     sections: [
       {
         heading: "Overview",
         body: (
           <>
-            Sign language is inherently spatiotemporal — meaning depends not
-            just on hand shape but on motion, trajectory, and timing. Most
-            digital solutions stop at static gesture classification.
-            HandSpeaker is a real-time sign language translation system built
-            on AR hand tracking that treats recognition as a sequence problem:
-            understanding motion as language.
+            Façade VR reimagines Façade (Mateas &amp; Stern, 2005) — the
+            landmark interactive drama in which a player, typing in natural
+            language, becomes entangled in the collapsing marriage of an
+            AI-driven couple — for the era of large language models and
+            spatial computing. Façade remains a touchstone twenty years on,
+            yet almost no work has reproduced its particular achievement: a
+            freely conversational, fully-performed drama steered by an
+            invisible director. The reason was never vision but cost. Its two
+            authors spent roughly two person-years hand-writing every beat,
+            line, and reaction in a stack of custom languages, and its
+            &ldquo;broad and shallow&rdquo; parser still misread the player
+            often enough to break the fiction. The successors that followed —
+            Prom Week, Versu, Bad News — each sidestepped that authorial
+            bottleneck rather than solving it. This project argues that LLMs
+            now make it possible to confront the bottleneck directly, and that
+            virtual reality adds a dimension Façade could never reach: the
+            player&apos;s own body, present in the room.
           </>
         ),
+        image: {
+          src: "/projects/Facade/Scene.png",
+          caption: "The single-room stage — the Jade Tower restaurant",
+        },
       },
       {
-        heading: "How it works",
+        heading: "Drama Manager 2.0",
         body: (
           <>
-            Instead of RGB images or depth sensors, the system operates
-            directly on 3D hand joint transforms streamed from AR Spectacles.
-            Motion is decomposed into spatial features (joint positions),
-            motion features (trajectory and velocity), and structural features
-            (joint angles). Static and dynamic gestures are unified as
-            temporal sequences — short for poses, longer for trajectories —
-            classified by a lightweight pipeline and pushed over WebSocket to
-            text and speech output with demo-grade latency.
+            At the system&apos;s core is a Drama Manager 2.0 that keeps
+            Façade&apos;s most durable abstraction — the beat, a minimal unit
+            of dramatic action selected against an Aristotelian tension arc —
+            while replacing its brittle internals. The manager pairs a frozen
+            LLM &ldquo;brain,&rdquo; which proposes and, when nothing on the
+            shelf fits, generates new beats, with a small trainable scoring
+            layer that learns the reward function the original hand-coded by
+            formula; human annotations of each playthrough (per-beat and
+            per-arc) train this layer, so the director&apos;s taste improves
+            with use rather than being frozen at authoring time. Inside each
+            beat, a fast LLM performs the scene live: the beat fixes the
+            dramatic intent and the story-state effects, while dialogue,
+            emotional register, and timing flex to whatever the player
+            actually says and does — same destination, improvised path.
           </>
         ),
+        image: {
+          src: "/projects/Facade/beat-1.png",
+          caption: "A single beat — the mother lacing a drink with poison",
+        },
       },
       {
-        heading: "Data pipeline",
+        heading: "The body in the room",
         body: (
           <>
-            No dataset exists for 3D hand-joint trajectories, so the project
-            includes its own: trigger-based 3-second recordings flow through
-            upload, timeline playback, manual labeling, and dataset
-            management in a web interface — turning every user interaction
-            into training-ready data for the next stage: LSTM/Transformer
-            models, sentence-level translation, and continuous unsegmented
-            signing.
+            Around this core, VR contributes three felt changes over the text
+            original: deeper immersion (the player stands inside the scene
+            rather than reading it), far higher freedom of interaction
+            (moving, approaching, gesturing, and handling objects all become
+            dramatic variables), and natural voice input that, married to LLM
+            understanding, removes both the typing wall and the
+            misrecognition that once shattered immersion. The work is grounded
+            in a concrete vertical slice — <em>Wrongest Person</em>, a tense
+            single-room thriller in which a mother&apos;s lethal trap is
+            sprung by the wrong arrival, her own daughter — authored as a
+            branching beat graph with multiple convergent endings.
+          </>
+        ),
+        images: [
+          {
+            src: "/projects/Facade/Character-Lin.png",
+            caption: "Lin — the mother",
+          },
+          {
+            src: "/projects/Facade/Character-May.png",
+            caption: "May — the daughter",
+          },
+        ],
+      },
+      {
+        heading: "Research direction",
+        body: (
+          <>
+            Academically, the project sits at the intersection of interactive
+            narrative, believable agents, and spatial computing, framed around
+            three questions: how drama management must extend once a
+            player&apos;s physical presence — position, gaze, gesture —
+            becomes a dramatic variable; whether LLM-generated dialogue can
+            remain dramatically coherent under beat-structure constraints (the
+            tension between hallucination and authorial control); and whether
+            VR embodiment can finally resolve Façade&apos;s unsolved
+            &ldquo;player-as-protagonist&rdquo; problem, where bodily presence
+            is itself a narrative act. Each development milestone is designed
+            to ship an evaluable result against one of these questions,
+            culminating in a study comparing the text and embodied versions on
+            presence, agency, and dramatic coherence.
           </>
         ),
       },
@@ -190,7 +259,8 @@ export const projects: Project[] = [
     tag: "Multiplayer VR · Unity 6 · 2026",
     blurb:
       "Networked VR spell-casting with bare hands — draw shapes in the air, cast synchronized magic.",
-    video: undefined,
+    cover: "/projects/callmemerlin-cover.png",
+    video: { type: "youtube", id: "OGo_ePGgGC0" },
     meta: [
       { label: "Team", value: "Qinchuan Zhang · Weibo Xu" },
       { label: "Stack", value: "Unity 6 · Photon Fusion 2 · XR Hands" },
@@ -300,67 +370,60 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "facade-vr",
+    slug: "handspeaker",
     featured: true,
-    title: "Facade VR",
-    tag: "AI Narrative · VR · In Development",
+    title: "HandSpeaker",
+    tag: "HCI · ML · Hardware · XR",
     blurb:
-      "Reimagining the classic interactive drama Façade with LLMs and embodied VR input.",
+      "Real-time sign language translation on AR glasses — understanding motion as language.",
+    cover: "/projects/handspeaker.png",
+    video: { type: "youtube", id: "TrCdpxfqvkI" },
     meta: [
-      { label: "Type", value: "Research · AI Narrative" },
-      { label: "Focus", value: "LLM drama management · embodied input" },
-      { label: "Status", value: "In development · 2026" },
+      { label: "Team", value: "Qinchuan Zhang · Weibo Xu" },
+      { label: "Type", value: "Research · HCI" },
+      { label: "Stack", value: "AR Spectacles · Hand Tracking · WebSocket" },
+      { label: "Focus", value: "Spatiotemporal gesture understanding" },
     ],
     sections: [
       {
         heading: "Overview",
         body: (
           <>
-            Façade (Mateas &amp; Stern, 2005) is still the landmark of
-            interactive drama: free-text conversation driving a structured
-            one-act play. Facade VR rebuilds that ambition with the tools of
-            this decade — large language models for understanding and
-            dialogue, spatial computing for presence — aiming at a drama that
-            responds not just to what you say, but to what you do in the
-            room. This is my current research focus.
+            Sign language is inherently spatiotemporal — meaning depends not
+            just on hand shape but on motion, trajectory, and timing. Most
+            digital solutions stop at static gesture classification.
+            HandSpeaker is a real-time sign language translation system built
+            on AR hand tracking that treats recognition as a sequence problem:
+            understanding motion as language.
           </>
         ),
       },
       {
-        heading: "Standing on Façade's shoulders",
+        heading: "How it works",
         body: (
           <>
-            The original&apos;s key abstractions survive: dramatic beats as
-            the unit of story, and discourse acts as the symbolic layer
-            between open input and structured drama. LLMs replace what
-            actually failed in 2005 — natural-language understanding and the
-            crushing cost of hand-authoring content — while a drama manager
-            keeps generation pinned to a deliberate tension arc instead of
-            letting the model wander.
+            Instead of RGB images or depth sensors, the system operates
+            directly on 3D hand joint transforms streamed from AR Spectacles.
+            Motion is decomposed into spatial features (joint positions),
+            motion features (trajectory and velocity), and structural features
+            (joint angles). Static and dynamic gestures are unified as
+            temporal sequences — short for poses, longer for trajectories —
+            classified by a lightweight pipeline and pushed over WebSocket to
+            text and speech output with demo-grade latency.
           </>
         ),
       },
       {
-        heading: "The body as dramatic input",
+        heading: "Data pipeline",
         body: (
           <>
-            In VR, physical behavior becomes a dramatic variable. Standing
-            between two arguing characters, meeting (or avoiding) someone&apos;s
-            gaze, picking up the wrong glass at the wrong moment — eye
-            tracking, hand tracking, and position turn embodiment itself into
-            the language you address the play with.
-          </>
-        ),
-      },
-      {
-        heading: "Research direction",
-        body: (
-          <>
-            The crisp technical claim: keep Façade&apos;s beat-selection
-            structure, but replace its hand-written scoring formula with a
-            reward model learned from human preference annotations —
-            bootstrapped by LLM self-play. Full design notes and a prototype
-            are in progress.
+            No dataset exists for 3D hand-joint trajectories, so the project
+            includes its own: trigger-based 3-second recordings flow through
+            upload, timeline playback, manual labeling, and dataset
+            management in a web interface — turning every user interaction
+            into training-ready data for the next stage: LSTM/Transformer
+            models, sentence-level translation, and continuous unsegmented
+            signing.
           </>
         ),
       },
@@ -407,7 +470,7 @@ export const projects: Project[] = [
     tag: "XR · HCI · 2026",
     blurb:
       "A VR experience that lets sighted people feel how monocular amblyopia changes everyday perception.",
-    cover: "/projects/vr-amblyopia.png",
+    video: { type: "youtube", id: "kjx3ip4HjnY" },
     meta: [
       { label: "Type", value: "XR · HCI" },
       { label: "Date", value: "2026" },
@@ -512,6 +575,7 @@ export const projects: Project[] = [
     title: "Vision Pro Interaction",
     tag: "XR · Vision Pro · 2025",
     blurb: "Interaction experiments on Apple Vision Pro.",
+    video: { type: "youtube", id: "PAiktpC329w" },
     meta: [
       { label: "Type", value: "XR Prototype" },
       { label: "Date", value: "Nov 2025" },
@@ -955,6 +1019,18 @@ export const site = {
         something.
       </>
     ),
+    socials: [
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/qinchuan-zhang-77126237a",
+        icon: "/linkedin.png",
+      },
+      {
+        label: "GitHub",
+        href: "https://github.com/ZQC8848",
+        icon: "/github.svg",
+      },
+    ],
     footerNote: "Built with React · Three.js · Lenis",
   },
 } as const;

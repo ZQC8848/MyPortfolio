@@ -465,6 +465,18 @@ em {
   color: var(--muted);
 }
 
+/* Side-by-side figures (e.g. a character lineup). Each cell reuses the
+   single-figure styles above; the grid just sits them in a row. */
+.project__gallery {
+  margin-top: 1.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+.project__gallery figure {
+  margin-top: 0;
+}
+
 .project__footer {
   margin-top: 5rem;
   padding-top: 2rem;
@@ -497,6 +509,28 @@ em {
 }
 .contact__mail:hover {
   color: var(--accent);
+}
+.contact__socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.contact__social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+.contact__social:hover {
+  color: var(--accent);
+}
+.contact__social-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 .contact__footer {
   display: flex;

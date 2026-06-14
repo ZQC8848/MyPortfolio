@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { projects, site } from "../content/site";
+import { useSessionState } from "../lib/useSessionState";
 
 /** Min column width in .work__grid (matches minmax(280px, …) in the CSS). */
 const CARD_MIN = 280;
@@ -11,7 +12,7 @@ export default function Work() {
   const featured = projects.filter((p) => p.featured);
   const gridRef = useRef<HTMLDivElement>(null);
   const [cols, setCols] = useState(featured.length);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useSessionState("work-expanded", false);
 
   // How many cards fit in one row = the responsive column count. Computed
   // from the grid's real width (deterministic — no dependence on how many
@@ -42,6 +43,7 @@ export default function Work() {
           <Link
             className="card"
             to={`/project/${p.slug}`}
+            state={{ from: "work" }}
             key={p.slug}
             hidden={i >= visibleCount}
           >

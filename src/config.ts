@@ -100,7 +100,7 @@ export const PARTICLES = {
    * particle gets a random factor in [min, max]. [1, 1] = uniform points;
    * widen the interval for a more organic, dusty look.
    */
-  sizeRange: [0.6, 2.4],
+  sizeRange: [1.2, 2.4],
   /** Models are normalized so their largest dimension equals this. */
   modelSize: 22,
   /** Random-scatter radius multiplier for the "explode" shape. */
