@@ -134,6 +134,86 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "snapfit",
+    featured: true,
+    title: "SnapFit",
+    tag: "GenAI · WebXR · Agents · 2026",
+    blurb:
+      "Snap a photo of any furniture and get an interactive 3D assembly guide — AI segments the parts, plans the steps, and coaches you through building it in MR.",
+    cover: "/projects/snapfit.png",
+    video: { type: "youtube", id: "-FzyaBe4YSA" },
+    meta: [
+      { label: "Team", value: "Qinchuan Zhang · Will Park · Cecil Boey" },
+      { label: "Type", value: "Hackathon · GenAI × XR" },
+      { label: "Stack", value: "TRIPO · DeepSeek · R3F · WebXR · ElevenLabs" },
+      { label: "Date", value: "Jul 2026 · Worlds in Action Hack, LA" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            Furniture manuals are a famous UX failure, and long-tail sellers
+            can&apos;t afford 3D teams to fix them. SnapFit is a zero-modeler
+            pipeline: a seller uploads one product photo, and the system
+            generates a part-segmented 3D model with semantic part names and a
+            step-by-step assembly plan. Buyers open it on desktop, phone, or a
+            headset and physically drag parts into place with a voice-guided
+            AI coach. Built with Will Park and Cecil Boey at Worlds in Action
+            Hack [02-LA].
+          </>
+        ),
+      },
+      {
+        heading: "The core insight",
+        body: (
+          <>
+            A model generated from a photo of <em>assembled</em> furniture has
+            every part already sitting in its assembled position — so the
+            correct placement needs no human annotation. Each part&apos;s snap
+            target is simply its original transform: exploded views translate
+            parts out along their centroids, and snapping lerps them back when
+            distance and rotation fall under a threshold. The whole
+            interaction layer is deterministic code that works for any part
+            list, whether segmentation returns five pieces or fourteen.
+          </>
+        ),
+      },
+      {
+        heading: "Agents that can't hallucinate geometry",
+        body: (
+          <>
+            LLMs can&apos;t read GLB files, so the compile-time agent gets a
+            translated view: per-part geometry summaries plus color-coded
+            renders for multimodal grounding, with TRIPO&apos;s Smart
+            Segmentation v2 providing the parts and GPT-Image-2 cleaning up
+            product photos. DeepSeek then plans assembly as a dependency DAG
+            rather than a linear list — four table legs don&apos;t care about
+            order. Every output passes deterministic validators (each part
+            used exactly once, DAG acyclic, targets already installed) that
+            feed concrete errors back for retry: hallucination control by
+            architecture, not prompt engineering.
+          </>
+        ),
+      },
+      {
+        heading: "The runtime coach",
+        body: (
+          <>
+            At runtime a lightweight coach agent tracks spatial state — the
+            current step, snapped parts, what&apos;s in your hand — and only
+            calls the LLM on events: a wrong part picked up, a step timing
+            out, a voice question. It answers in one sentence through
+            ElevenLabs voice while highlighting the part it means, so speech
+            and spatial action come from the same call. The React Three Fiber
+            + WebXR runtime deploys the same experience to browser, phone,
+            and headset from one codebase.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     slug: "facade-vr",
     featured: true,
     title: "Facade VR",
