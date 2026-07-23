@@ -143,7 +143,7 @@ export const projects: Project[] = [
     cover: "/projects/snapfit.png",
     video: { type: "youtube", id: "-FzyaBe4YSA" },
     meta: [
-      { label: "Team", value: "Qinchuan Zhang · Will Park · Cecil Boey" },
+      { label: "Team", value: "Qinchuan Zhang · Solo" },
       { label: "Type", value: "Hackathon · GenAI × XR" },
       { label: "Stack", value: "TRIPO · DeepSeek · R3F · WebXR · ElevenLabs" },
       { label: "Date", value: "Jul 2026 · Worlds in Action Hack, LA" },
@@ -159,8 +159,7 @@ export const projects: Project[] = [
             generates a part-segmented 3D model with semantic part names and a
             step-by-step assembly plan. Buyers open it on desktop, phone, or a
             headset and physically drag parts into place with a voice-guided
-            AI coach. Built with Will Park and Cecil Boey at Worlds in Action
-            Hack [02-LA].
+            AI coach. Built solo at Worlds in Action Hack [02-LA].
           </>
         ),
       },
