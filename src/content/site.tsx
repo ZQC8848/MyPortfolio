@@ -49,7 +49,7 @@ export const projects: Project[] = [
     slug: "syncscape",
     featured: true,
     title: "SyncScape",
-    tag: "Gaussian Splat · HCI · 2026",
+    tag: "Winner · Gaussian Splat · HCI · 2026",
     blurb:
       "Aligning AI-generated virtual rooms with physical space in MR — walk freely, no motion sickness.",
     cover: "/projects/syncscape.png",
@@ -57,6 +57,7 @@ export const projects: Project[] = [
     meta: [
       { label: "Team", value: "Qinchuan Zhang · Weibo Xu" },
       { label: "Type", value: "Research · XR" },
+      { label: "Award", value: "Winner · Worlds in Action Hack [01-SF]" },
       { label: "Stack", value: "Quest 3 · Unity MRUK · WorldLabs · Open3D" },
       { label: "Date", value: "2026" },
     ],
@@ -137,7 +138,7 @@ export const projects: Project[] = [
     slug: "snapfit",
     featured: true,
     title: "SnapFit",
-    tag: "GenAI · WebXR · Agents · 2026",
+    tag: "Winner · GenAI · WebXR · Agents · 2026",
     blurb:
       "Snap a photo of any furniture and get an interactive 3D assembly guide — AI segments the parts, plans the steps, and coaches you through building it in MR.",
     cover: "/projects/snapfit.png",
@@ -145,6 +146,7 @@ export const projects: Project[] = [
     meta: [
       { label: "Team", value: "Qinchuan Zhang · Solo" },
       { label: "Type", value: "Hackathon · GenAI × XR" },
+      { label: "Award", value: "Winner · Worlds in Action Hack [02-LA]" },
       { label: "Stack", value: "TRIPO · DeepSeek · R3F · WebXR · ElevenLabs" },
       { label: "Date", value: "Jul 2026 · Worlds in Action Hack, LA" },
     ],
@@ -452,7 +454,7 @@ export const projects: Project[] = [
     slug: "handspeaker",
     featured: true,
     title: "HandSpeaker",
-    tag: "HCI · ML · Hardware · XR",
+    tag: "Winner · HCI · ML · Hardware · XR",
     blurb:
       "Real-time sign language translation on AR glasses — understanding motion as language.",
     cover: "/projects/handspeaker.png",
@@ -460,6 +462,7 @@ export const projects: Project[] = [
     meta: [
       { label: "Team", value: "Qinchuan Zhang · Weibo Xu" },
       { label: "Type", value: "Research · HCI" },
+      { label: "Award", value: "Winner · Shift SC Hack" },
       { label: "Stack", value: "AR Spectacles · Hand Tracking · WebSocket" },
       { label: "Focus", value: "Spatiotemporal gesture understanding" },
     ],
