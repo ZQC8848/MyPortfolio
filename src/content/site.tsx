@@ -40,6 +40,8 @@ export interface Project {
   /** Card/detail cover image; omit to use a gradient placeholder card. */
   cover?: string;
   video?: ProjectVideo;
+  /** Prominent live-demo CTA rendered between the hero and the sections. */
+  demo?: { url: string; label?: string; note?: string };
   meta: { label: string; value: string }[];
   sections: ProjectSection[];
 }
@@ -143,6 +145,11 @@ export const projects: Project[] = [
       "An AI-generated panoramic video lifted frame-by-frame into Gaussian splats — a dynamic 3D world you can fly through in the browser.",
     cover: "/projects/4dgs-world-lab.jpg",
     video: { type: "youtube", id: "AoWj9Hvs0N4" },
+    demo: {
+      url: "https://4dgsworldlab.vercel.app/",
+      label: "Launch live demo",
+      note: "Best on desktop · playback tiers adapt to your device",
+    },
     meta: [
       { label: "Team", value: "Qinchuan Zhang" },
       { label: "Type", value: "Research · GenAI × 3D" },
@@ -156,16 +163,7 @@ export const projects: Project[] = [
           "Turning AI Video into a Walkable 4D World: A Seedance × World Labs Pipeline",
         body: (
           <>
-            Live demo:{" "}
-            <a
-              href="https://4dgsworldlab.vercel.app/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              4dgsworldlab.vercel.app
-            </a>{" "}
-            — best on desktop; playback tiers adapt to your device. 3D
-            Gaussian Splatting gives us photoreal, explorable scenes, but
+            3D Gaussian Splatting gives us photoreal, explorable scenes, but
             they are frozen in time. Video models give us motion, but trap it
             on a flat screen. This project connects the two: generate a
             panoramic video with Seedance 2, extract every frame, lift each

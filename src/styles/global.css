@@ -161,6 +161,21 @@ em {
   color: var(--bg);
 }
 
+/* Live-demo CTA module on project detail pages, between hero and sections. */
+.project__demo {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+.project__demo .hero__cta {
+  margin-top: 0;
+}
+.project__demo-note {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #a1a1aa;
+}
+
 .hero__scroll {
   position: absolute;
   inset: auto var(--pad) 2rem auto;

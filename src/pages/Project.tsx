@@ -70,6 +70,22 @@ export default function Project() {
         )
       )}
 
+      {project.demo && (
+        <div className="project__demo">
+          <a
+            className="hero__cta"
+            href={project.demo.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {project.demo.label ?? "Launch live demo"} ↗
+          </a>
+          {project.demo.note && (
+            <p className="project__demo-note">{project.demo.note}</p>
+          )}
+        </div>
+      )}
+
       <div className="project__sections">
         {project.sections.map((s) => (
           <section className="project__section" key={s.heading}>
