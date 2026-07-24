@@ -147,14 +147,25 @@ export const projects: Project[] = [
       { label: "Team", value: "Qinchuan Zhang" },
       { label: "Type", value: "Research · GenAI × 3D" },
       { label: "Stack", value: "Seedance 2 · Marble 1.1 API · Three.js · Spark" },
+      { label: "Live", value: "4dgsworldlab.vercel.app" },
       { label: "Date", value: "Jul 2026" },
     ],
     sections: [
       {
-        heading: "The idea",
+        heading:
+          "Turning AI Video into a Walkable 4D World: A Seedance × World Labs Pipeline",
         body: (
           <>
-            3D Gaussian Splatting gives us photoreal, explorable scenes, but
+            Live demo:{" "}
+            <a
+              href="https://4dgsworldlab.vercel.app/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              4dgsworldlab.vercel.app
+            </a>{" "}
+            — best on desktop; playback tiers adapt to your device. 3D
+            Gaussian Splatting gives us photoreal, explorable scenes, but
             they are frozen in time. Video models give us motion, but trap it
             on a flat screen. This project connects the two: generate a
             panoramic video with Seedance 2, extract every frame, lift each
