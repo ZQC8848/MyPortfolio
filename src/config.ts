@@ -129,6 +129,16 @@ export const PARTICLES = {
   explodeSpread: 2.2,
   colorA: "#6ea8fe",
   colorB: "#c084fc",
+  /**
+   * Brightness multiplier applied to every point's colour before additive
+   * blending (1 = the raw colours above). Desktop runs many small, dense
+   * points that read dim against the dark ground; boosting them here makes
+   * overlaps bloom without touching the palette. Values above 1 are fine —
+   * additive blending simply saturates where points stack.
+   */
+  brightness: 1.6,
+  /** Overrides `brightness` below MOBILE_BREAKPOINT (fewer, larger points). */
+  brightnessMobile: 1,
   /** How quickly the morph chases the scroll position (higher = snappier). */
   damp: 4,
   /**
@@ -234,6 +244,12 @@ export function getParticleSize(): number {
   return isMobileViewport()
     ? PARTICLES.size * PARTICLES.sizeMobileScale
     : PARTICLES.size;
+}
+
+export function getParticleBrightness(): number {
+  return isMobileViewport()
+    ? PARTICLES.brightnessMobile
+    : PARTICLES.brightness;
 }
 
 export function getAmbientSize(): number {

@@ -39,12 +39,16 @@ export const particleVertexShader = /* glsl */ `
 export const particleFragmentShader = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
+  uniform float uBrightness;
   varying float vRandom;
 
   void main() {
     float d = length(gl_PointCoord - 0.5);
     if (d > 0.5) discard;
     float alpha = smoothstep(0.5, 0.05, d);
-    gl_FragColor = vec4(mix(uColorA, uColorB, vRandom), alpha * 0.85);
+    gl_FragColor = vec4(
+      mix(uColorA, uColorB, vRandom) * uBrightness,
+      alpha * 0.85
+    );
   }
 `;

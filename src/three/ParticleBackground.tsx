@@ -11,6 +11,7 @@ import {
   SHAPE_KEYFRAMES,
   getAmbientSize,
   getDprRange,
+  getParticleBrightness,
   getParticleCount,
   getParticleSize,
   isHoverPointer,
@@ -190,6 +191,7 @@ function AmbientScatter() {
       uPixelRatio: { value: 1 }, // synced per-frame to the real renderer DPR
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
+      uBrightness: { value: getParticleBrightness() },
       uRayOrigin: { value: sharedRay.origin },
       uRayDir: { value: sharedRay.dir },
       uMouseRadius: { value: POINTER_FX.repelRadius },
@@ -300,6 +302,7 @@ function Particles({ routeKey }: { routeKey: string }) {
       uPixelRatio: { value: 1 }, // synced per-frame to the real renderer DPR
       uColorA: { value: new THREE.Color(PARTICLES.colorA) },
       uColorB: { value: new THREE.Color(PARTICLES.colorB) },
+      uBrightness: { value: getParticleBrightness() },
       uRayOrigin: { value: sharedRay.origin },
       uRayDir: { value: sharedRay.dir },
       uMouseRadius: { value: POINTER_FX.repelRadius },
