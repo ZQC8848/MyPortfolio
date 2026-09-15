@@ -400,18 +400,18 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "facade-vr",
+    slug: "wrongest-person",
     featured: true,
-    title: "Facade VR",
-    tag: "AI Narrative · VR · In Development",
+    title: "Wrongest Person",
+    tag: "AI Narrative · Web · In Development",
     blurb:
-      "Reimagining the classic interactive drama Façade with LLMs and embodied VR input.",
-    cover: "/projects/Facade/FacadeVR.png",
+      "A Façade-inspired 2D interactive drama driven by an LLM-based, trainable Drama Manager.",
+    cover: "/projects/wrongest-person/cover.png",
     video: { type: "slides", id: "1sTbBGU0PDYkJOl3BOyUQpD7nso6j3ohi" },
     meta: [
-      { label: "Team", value: "Qinchuan Zhang · Biying Zeng" },
+      { label: "Team", value: "Qinchuan Zhang" },
       { label: "Type", value: "Research · AI Narrative" },
-      { label: "Focus", value: "LLM drama management · embodied input" },
+      { label: "Stack", value: "React · Phaser · FastAPI · LLM + TTS" },
       { label: "Status", value: "In development · 2026" },
     ],
     sections: [
@@ -419,28 +419,28 @@ export const projects: Project[] = [
         heading: "Overview",
         body: (
           <>
-            Façade VR reimagines Façade (Mateas &amp; Stern, 2005) — the
-            landmark interactive drama in which a player, typing in natural
-            language, becomes entangled in the collapsing marriage of an
-            AI-driven couple — for the era of large language models and
-            spatial computing. Façade remains a touchstone twenty years on,
-            yet almost no work has reproduced its particular achievement: a
-            freely conversational, fully-performed drama steered by an
+            Wrongest Person is a research prototype for an LLM-driven,
+            trainable Drama Manager, inspired by Façade (Mateas &amp; Stern,
+            2005) — the landmark interactive drama in which a player, typing
+            in natural language, becomes entangled in the collapsing marriage
+            of an AI-driven couple. Façade remains a touchstone twenty years
+            on, yet almost no work has reproduced its particular achievement:
+            a freely conversational, fully-performed drama steered by an
             invisible director. The reason was never vision but cost. Its two
             authors spent roughly two person-years hand-writing every beat,
             line, and reaction in a stack of custom languages, and its
             &ldquo;broad and shallow&rdquo; parser still misread the player
-            often enough to break the fiction. The successors that followed —
-            Prom Week, Versu, Bad News — each sidestepped that authorial
-            bottleneck rather than solving it. This project argues that LLMs
-            now make it possible to confront the bottleneck directly, and that
-            virtual reality adds a dimension Façade could never reach: the
-            player&apos;s own body, present in the room.
+            often enough to break the fiction. This project argues that LLMs
+            now make it possible to confront that authorial bottleneck
+            directly, and tests the claim in a single tense scene: after
+            closing time at the Jade restaurant, a mother&apos;s lethal trap
+            is sprung by the wrong arrival — her own fifteen-year-old
+            daughter, May, whom the player controls.
           </>
         ),
         image: {
-          src: "/projects/Facade/Scene.png",
-          caption: "The single-room stage — the Jade Tower restaurant",
+          src: "/projects/wrongest-person/Scene.png",
+          caption: "The single-room stage — the Jade restaurant after hours",
         },
       },
       {
@@ -464,55 +464,60 @@ export const projects: Project[] = [
           </>
         ),
         image: {
-          src: "/projects/Facade/beat-1.png",
+          src: "/projects/wrongest-person/beat-1.png",
           caption: "A single beat — the mother lacing a drink with poison",
         },
       },
       {
-        heading: "The body in the room",
+        heading: "Two layers of character",
         body: (
           <>
-            Around this core, VR contributes three felt changes over the text
-            original: deeper immersion (the player stands inside the scene
-            rather than reading it), far higher freedom of interaction
-            (moving, approaching, gesturing, and handling objects all become
-            dramatic variables), and natural voice input that, married to LLM
-            understanding, removes both the typing wall and the
-            misrecognition that once shattered immersion. The work is grounded
-            in a concrete vertical slice — <em>Wrongest Person</em>, a tense
-            single-room thriller in which a mother&apos;s lethal trap is
-            sprung by the wrong arrival, her own daughter — authored as a
-            branching beat graph with multiple convergent endings.
+            The presentation splits each character into two fidelities.
+            During exploration, small Stardew-style sprites move around a
+            single restaurant map, approaching the bar, the red envelope, the
+            poisoned glass, the gun taped under the table — every action
+            becomes a clean, discrete event the Drama Manager can read (who
+            the player walked toward, how long they lingered, whether they
+            tried to leave). When a beat fires, the view cuts to dynamic
+            portraits: layered art in which eyes, brows, mouth, gaze, and body
+            lean are driven continuously by structured commands from the
+            manager — a preset like <em>suppressed_panic</em> at a given
+            intensity, a gaze target, a transition time — and the mouth is
+            synced to generated speech from audio amplitude. This keeps the
+            felt Façade quality of acting freely in a room and being answered
+            by living faces, while spending nothing on full-body animation
+            that would not advance the research question.
           </>
         ),
         images: [
           {
-            src: "/projects/Facade/Character-Lin.png",
+            src: "/projects/wrongest-person/Character-Lin.png",
             caption: "Lin — the mother",
           },
           {
-            src: "/projects/Facade/Character-May.png",
+            src: "/projects/wrongest-person/Character-May.png",
             caption: "May — the daughter",
           },
         ],
       },
       {
-        heading: "Research direction",
+        heading: "Architecture and research direction",
         body: (
           <>
-            Academically, the project sits at the intersection of interactive
-            narrative, believable agents, and spatial computing, framed around
-            three questions: how drama management must extend once a
-            player&apos;s physical presence — position, gaze, gesture —
-            becomes a dramatic variable; whether LLM-generated dialogue can
-            remain dramatically coherent under beat-structure constraints (the
-            tension between hallucination and authorial control); and whether
-            VR embodiment can finally resolve Façade&apos;s unsolved
-            &ldquo;player-as-protagonist&rdquo; problem, where bodily presence
-            is itself a narrative act. Each development milestone is designed
-            to ship an evaluable result against one of these questions,
-            culminating in a study comparing the text and embodied versions on
-            presence, agency, and dramatic coherence.
+            The front end is React and TypeScript with Phaser for the map,
+            movement, and interactables, and a separate canvas layer for
+            portraits; the Drama Manager is an independent Python service
+            connected over WebSocket. The front end never understands the
+            plot — it only performs generic commands — so the same back end
+            can later drive a 3D or VR stage. The prototype is framed around
+            four questions: can an LLM propose dramatically sensible new beats
+            from story state; does a learned scorer track tension better than
+            Façade&apos;s fixed weights; can dynamic expression faithfully
+            carry a beat&apos;s subtext; and can free player input and object
+            interaction feed a structured narrative without breaking
+            coherence. Embodied VR input — gaze, gesture, bodily presence —
+            remains the long-term direction once the core algorithm is
+            validated.
           </>
         ),
       },
