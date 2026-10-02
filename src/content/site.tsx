@@ -83,6 +83,68 @@ export const projects: Project[] = [
         ),
       },
       {
+        heading: "A cat, from ink to life",
+        body: (
+          <>
+            Every summon follows the same ritual. The sealed painting floats in
+            front of you, the candle sets it alight, and when the paper burns
+            away the result appears exactly where the scroll was floating. This
+            cat lands on the desk, plays its animation and meows.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/reveal-cat.png",
+          caption: "Wu seal: the painted cat burns away and a rigged, animated Tripo cat steps out (burn sped up)",
+        },
+      },
+      {
+        heading: "Any object",
+        body: (
+          <>
+            Anything GPT can recognise can be summoned. Living things are rigged
+            and animated; still objects like this watermelon arrive as detailed
+            PBR models you can pick up and turn in your hands.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/reveal-watermelon.png",
+          caption: "Wu seal: a painted watermelon becomes a Tripo 3D watermelon (burn sped up)",
+        },
+      },
+      {
+        heading: "Or a whole world",
+        body: (
+          <>
+            With the Jing seal, the painting becomes the place you stand in. A
+            few strokes of hills and a tree grow into a World Labs meadow that
+            unfolds around the lotus throne, with its own ambient sound.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/reveal-world.png",
+          caption: "Jing seal: a painted meadow becomes a Gaussian splat world around the desk (burn sped up)",
+        },
+      },
+      {
+        heading: "The burning is the loading bar",
+        body: (
+          <>
+            Generation takes time, so the waiting became the ritual. Once
+            stamped, the scroll rises and floats in front of you. GPT reads the
+            drawing and decides whether it is recognisable and what to make;
+            GPT Image redraws it as a clean reference; Tripo or World Labs
+            builds it while ElevenLabs creates its sound. The fire waits for
+            the AI&apos;s verdict, then follows the real generation progress
+            to the end. A scribble the brush cannot understand simply
+            crumbles to ash.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/pipeline.jpg",
+          caption: "The summoning pipeline, from the stamped seal to an object or a world",
+        },
+      },
+      {
         heading: "Painting with a real brush",
         body: (
           <>
@@ -119,47 +181,16 @@ export const projects: Project[] = [
         },
       },
       {
-        heading: "The burning is the loading bar",
+        heading: "Kept in the drawers",
         body: (
           <>
-            Generation takes time, so the waiting became the ritual. Once
-            stamped, the scroll rises and floats in front of you. GPT reads the
-            drawing and decides whether it is recognisable and what to make;
-            GPT Image redraws it as a clean reference; Tripo or World Labs
-            builds it while ElevenLabs creates its sound. The fire waits for
-            the AI&apos;s verdict, then follows the real generation progress
-            to the end. A scribble the brush cannot understand simply
-            crumbles to ash.
+            Every work is rolled up and kept in the desk drawers with its seal
+            on a paper tag. Lay one on the desk and burn it again to relive it,
+            or burn the sky scroll to clear a world and return to the clouds.
+            Bundled works and a keyword fallback keep the experience complete
+            even offline.
           </>
         ),
-        image: {
-          src: "/projects/maliang/pipeline.jpg",
-          caption: "The summoning pipeline, from the stamped seal to an object or a world",
-        },
-      },
-      {
-        heading: "From ink to life",
-        body: (
-          <>
-            When the paper burns away, the result appears exactly where the
-            scroll was floating: the cat you painted lands on the desk, plays
-            its animation and meows. Every work is rolled up and kept in the
-            desk drawers with its seal on a paper tag. Lay one on the desk and
-            burn it again to relive it, or burn the sky scroll to clear a world
-            and return to the clouds. Bundled works and a keyword fallback keep
-            the experience complete even offline.
-          </>
-        ),
-        images: [
-          {
-            src: "/projects/maliang/cat-painting.jpg",
-            caption: "The painting, sealed and floating, before it is lit",
-          },
-          {
-            src: "/projects/maliang/cat-summoned.jpg",
-            caption: "What it becomes: a rigged, animated Tripo cat",
-          },
-        ],
       },
       {
         heading: "A world around the throne",
