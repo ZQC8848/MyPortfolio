@@ -48,6 +48,164 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    slug: "maliang",
+    featured: true,
+    title: "Maliang 马良",
+    tag: "GenAI · VR · Tripothon · 2026",
+    blurb:
+      "A VR ritual inspired by the Chinese tale of the magic brush: paint on a scroll, stamp a seal, set it on fire, and your drawing comes alive as a 3D creature or a whole world.",
+    cover: "/projects/maliang/cover.jpg",
+    video: { type: "youtube", id: "YE6LRV4GBCA" },
+    meta: [
+      { label: "Team", value: "Qinchuan Zhang · Solo" },
+      { label: "Type", value: "Hackathon · GenAI × VR" },
+      { label: "Event", value: "Tripothon Demo Day · San Francisco · Oct 8, 2026" },
+      {
+        label: "Stack",
+        value: "Unity 6 · OpenXR · PICO · Tripo AI · World Labs · GPT Image · ElevenLabs",
+      },
+      { label: "Date", value: "Oct 2026 · built in 2 days" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            Maliang is a boy from a Chinese folk tale whose magic brush made
+            everything he painted real. This project turns that tale into a VR
+            ritual. You sit at a scholar&apos;s desk on a lotus throne above
+            the clouds, paint on a scroll with a calligraphy brush, press a
+            seal onto it, and hold a candle to the paper. When the last ember
+            fades, your drawing steps out of the ashes: a rigged, animated 3D
+            creature with its own voice, or an entire Gaussian splat world that
+            blooms around your desk.
+          </>
+        ),
+      },
+      {
+        heading: "Painting with a real brush",
+        body: (
+          <>
+            The brush is a physical tool, not a pointer. Press it deeper into
+            the paper and the stroke gets bolder; the bristles bend with the
+            motion and the controller&apos;s haptics let you feel the paper.
+            Dip it into one of ten traditional pigments to change colour, and
+            undo up to twenty strokes until the seal goes down. Once stamped,
+            the painting is final.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/paint.jpg",
+          caption: "Painting a dog on the scroll with the calligraphy brush",
+        },
+      },
+      {
+        heading: "Two seals, two kinds of magic",
+        body: (
+          <>
+            The seal decides what the painting becomes. The bronze Wu (物)
+            seal, carved with the Tripo logo, summons an object: Tripo AI turns
+            the drawing into a 3D model, then rigs and animates it. The jade
+            Jing (境) seal, carved with the World Labs logo, summons a place:
+            World Labs&apos; Marble grows a full Gaussian splat world around
+            the lotus throne, with an ElevenLabs ambience to match. The seals
+            themselves, the lotus throne, the candle stand and the inkstone are
+            all Tripo generated props.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/seals.jpg",
+          caption: "The jade Jing seal (World Labs) and the bronze Wu seal (Tripo)",
+        },
+      },
+      {
+        heading: "The burning is the loading bar",
+        body: (
+          <>
+            Generation takes time, so the waiting became the ritual. Once
+            stamped, the scroll rises and floats in front of you. GPT reads the
+            drawing and decides whether it is recognisable and what to make;
+            GPT Image redraws it as a clean reference; Tripo or World Labs
+            builds it while ElevenLabs creates its sound. The fire waits for
+            the AI&apos;s verdict, then follows the real generation progress
+            to the end. A scribble the brush cannot understand simply
+            crumbles to ash.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/pipeline.jpg",
+          caption: "The summoning pipeline, from the stamped seal to an object or a world",
+        },
+      },
+      {
+        heading: "From ink to life",
+        body: (
+          <>
+            When the paper burns away, the result appears exactly where the
+            scroll was floating: the cat you painted lands on the desk, plays
+            its animation and meows. Every work is rolled up and kept in the
+            desk drawers with its seal on a paper tag. Lay one on the desk and
+            burn it again to relive it, or burn the sky scroll to clear a world
+            and return to the clouds. Bundled works and a keyword fallback keep
+            the experience complete even offline.
+          </>
+        ),
+        images: [
+          {
+            src: "/projects/maliang/cat-painting.jpg",
+            caption: "The painting, sealed and floating, before it is lit",
+          },
+          {
+            src: "/projects/maliang/cat-summoned.jpg",
+            caption: "What it becomes: a rigged, animated Tripo cat",
+          },
+        ],
+      },
+      {
+        heading: "A world around the throne",
+        body: (
+          <>
+            A Jing scroll never teleports you away. The desk stays where it is
+            and the generated world unfolds around the lotus throne, scaled
+            and grounded to the platform, while the fire and embers still draw
+            in front of the splats.
+          </>
+        ),
+        image: {
+          src: "/projects/maliang/world.jpg",
+          caption: "A World Labs meadow around the desk: player view, side and outside",
+        },
+      },
+      {
+        heading: "Built solo in two days with an AI agent",
+        body: (
+          <>
+            I built Maliang alone in two days, developing on a PICO headset,
+            with Claude Opus 5.5 working in the Unity editor through Unity MCP.
+            The agent wrote and debugged the code, ran every step in play mode,
+            and even recorded the demo footage, which left me free to focus on
+            the experience and the design decisions.
+          </>
+        ),
+      },
+      {
+        heading: "Culture is not a free pass",
+        body: (
+          <>
+            Maliang borrows a lot from Chinese tradition: the tale, the ink,
+            the seals, the scroll. But I believe culture, or any message a
+            project wants to promote, can never excuse bad interaction. Bad is
+            bad, good is good. My test was simple: strip out every cultural
+            element, and the loop of painting, stamping, burning and watching
+            it come alive should still be worth playing. Great interaction is
+            what makes people who know nothing about a culture curious to learn
+            more; bad interaction only gives them another reason to walk away.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     slug: "syncscape",
     featured: true,
     title: "SyncScape",
