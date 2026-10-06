@@ -340,7 +340,7 @@ export const projects: Project[] = [
       note: "Best on desktop · playback tiers adapt to your device",
     },
     meta: [
-      { label: "Team", value: "Qinchuan Zhang" },
+      { label: "Team", value: "Qinchuan Zhang · Wanhe Jiang" },
       { label: "Type", value: "Research · GenAI × 3D" },
       { label: "Stack", value: "Seedance 2 · Marble 1.1 API · Three.js · Spark" },
       { label: "Live", value: "4dgsworldlab.vercel.app" },
