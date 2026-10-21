@@ -48,6 +48,167 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    slug: "wildfiretwinla",
+    featured: true,
+    title: "WildfireTwinLA",
+    tag: "Digital Twin · GPU Simulation · Dual-Use Hackathon · 2026",
+    blurb:
+      "A browser-based 3D digital twin of the hills around San Clemente that replays the Norte Fire from public satellite data, simulates its spread on the GPU, and decides which homes to call first.",
+    cover: "/projects/wildfiretwinla/cover.jpg",
+    video: { type: "youtube", id: "epe-jNK4YTc" },
+    demo: {
+      url: "https://wildfiretwinla.vercel.app/",
+      label: "Launch live demo",
+      note: "Best on desktop · runs entirely in your browser · residents and calls are simulated",
+    },
+    meta: [
+      {
+        label: "Team",
+        value: "Qinchuan Zhang (3D, GPU simulation, emergency contact) · Tia (data and backend) · Lucia Sun (planning algorithms)",
+      },
+      { label: "Type", value: "Hackathon · Disaster resilience · Dual use" },
+      { label: "Event", value: "The Dual-Use Hackathon · InnovateLA × USC Viterbi · LA Tech Week · Oct 16–18, 2026" },
+      {
+        label: "Stack",
+        value: "Three.js · WebGL2 GLSL · TypeScript · Web Workers · FastAPI · NASA FIRMS · NOAA HRRR · WindNinja · LANDFIRE · Vercel",
+      },
+      { label: "Code", value: "github.com/ZQC8848/WildfireTwinLA" },
+      { label: "Date", value: "Oct 2026" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            On October 16, 2026 the Norte Fire burned 570 acres between San
+            Clemente and San Juan Capistrano while we were at the hackathon.
+            WildfireTwinLA rebuilds 164 km² of that terrain in the browser,
+            with 50,000 buildings, real fuels and terrain-adjusted wind, and
+            replays the fire from public data. The same map works on an
+            ordinary day, when planners compare fuel treatments, and during
+            a fire, when it turns the projected spread into an outreach queue:
+            who to call first, what happens when nobody answers, and who asked
+            for help.
+          </>
+        ),
+        image: {
+          src: "/projects/wildfiretwinla/twin.jpg",
+          caption: "The whole digital twin from over the ocean, with the Norte Fire burning inland",
+        },
+      },
+      {
+        heading: "Replaying a real fire",
+        body: (
+          <>
+            The Respond view replays the fire from the NIFC ignition records,
+            the NASA FIRMS VIIRS satellite passes and archived NOAA HRRR wind.
+            At each satellite pass the model is scored before the detections
+            are assimilated: how many hotspot pixels it had already reached,
+            and how much of its fire sits near a detection. After the first
+            day the replay fast-forwards through the official updates. The
+            crews&apos; knockdown stops the model spread, the first satellite
+            pass with no heat puts the model flames out, and CAL FIRE
+            containment, lifted evacuation orders and the NIFC perimeter
+            follow.
+          </>
+        ),
+        image: {
+          src: "/projects/wildfiretwinla/respond.jpg",
+          caption: "Respond mode: satellite hotspots against the model fire, with the emergency contact dock",
+        },
+      },
+      {
+        heading: "Fire spread on the GPU",
+        body: (
+          <>
+            I wrote the spread model as a cellular automaton in GLSL: 25 m
+            cells on a 512² grid, each step one fullscreen pass. Spread depends
+            on terrain-adjusted wind, slope, fuel and dryness, and embers are
+            sampled upwind. Short-lived grass embers burn out in the air, while
+            rare lofted ones can start a spot fire kilometres away, as the
+            Norte Fire did. A CPU reference uses the same integer hash for its
+            random numbers and matches the GPU cell for cell. The same shader
+            runs 64 perturbed members at once for an 8-hour forecast of burn
+            probability and arrival time.
+          </>
+        ),
+        images: [
+          {
+            src: "/projects/wildfiretwinla/wind.jpg",
+            caption: "NOAA HRRR wind bent by the terrain (WindNinja) over the active fire edge",
+          },
+          {
+            src: "/projects/wildfiretwinla/forecast.jpg",
+            caption: "64-run forecast: chance of burning and median arrival lines per community",
+          },
+        ],
+      },
+      {
+        heading: "A 3D model you can walk through",
+        body: (
+          <>
+            Buildings, trees and power lines are instanced models placed from
+            OpenStreetMap footprints and LANDFIRE fuels, and they read the
+            simulation state directly on the GPU: trees ignite and char, roofs
+            catch fire, and burned houses glow with embers. Level of detail
+            keeps the whole region interactive in the browser.
+          </>
+        ),
+        images: [
+          {
+            src: "/projects/wildfiretwinla/embers.jpg",
+            caption: "Burning trees and charred ground at the fire edge",
+          },
+          {
+            src: "/projects/wildfiretwinla/neighborhood.jpg",
+            caption: "An untouched neighbourhood: tile roofs, craftsman and modern houses",
+          },
+        ],
+      },
+      {
+        heading: "Who to call first",
+        body: (
+          <>
+            A warning sent is not a person reached. The emergency contact
+            system calls the homes nearest the fire first on six lines and
+            texts everyone nearby. Unanswered calls are retried, then followed
+            by a text; residents who ask for help stay on the map. Roof markers
+            and a screen-space outline tie every line in the dock to the house
+            being called. Without a backend the dispatcher runs in a Web Worker,
+            so the public demo works entirely in the browser. All residents and
+            phone numbers are fictional.
+          </>
+        ),
+        images: [
+          {
+            src: "/projects/wildfiretwinla/calls.jpg",
+            caption: "Homes being called, outlined on the map, next to the six call lines",
+          },
+          {
+            src: "/projects/wildfiretwinla/help.jpg",
+            caption: "Homes that asked for help stay outlined while the fire reaches the block",
+          },
+        ],
+      },
+      {
+        heading: "Preparing before the fire",
+        body: (
+          <>
+            In Plan mode you paint fuel breaks, prescribed burns, thinning or
+            home hardening onto the terrain, set a test fire, and compare your
+            plan with a greedy planner and a min-cut baseline under the same
+            ignition and wind, five simulation runs each. Differences inside
+            run-to-run noise are shown as noise, not as homes saved.
+          </>
+        ),
+        image: {
+          src: "/projects/wildfiretwinla/plan.jpg",
+          caption: "A fuel break drawn downwind of the Norte ignition",
+        },
+      },
+    ],
+  },
+  {
     slug: "maliang",
     featured: true,
     title: "Maliang 马良",
