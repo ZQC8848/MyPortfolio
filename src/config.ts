@@ -110,13 +110,14 @@ export const PARTICLES = {
   count: 15000,
   countMobile: 7000,
   /** Base point size (scaled by depth + pixel ratio in the vertex shader). */
-  size: 42,
+  size: 50,
   /**
    * Multiplier on `size` below MOBILE_BREAKPOINT. Phones run far fewer,
    * more spread-out points, so bumping this keeps the cloud reading as a
    * solid shape instead of a thin sprinkle. 1 = same as desktop.
+   * (50 × 4.2 = 210, the same mobile size as before.)
    */
-  sizeMobileScale: 5,
+  sizeMobileScale: 4.2,
   /**
    * Per-particle random size interval, as multipliers of `size`: each
    * particle gets a random factor in [min, max]. [1, 1] = uniform points;
@@ -136,9 +137,17 @@ export const PARTICLES = {
    * overlaps bloom without touching the palette. Values above 1 are fine —
    * additive blending simply saturates where points stack.
    */
-  brightness: 1.6,
+  brightness: 2,
   /** Overrides `brightness` below MOBILE_BREAKPOINT (fewer, larger points). */
   brightnessMobile: 1,
+  /**
+   * Bloom-like glow: each point's sprite grows by this fraction and the
+   * extra ring gets a soft falloff halo, which additive blending sums into
+   * a glow where points cluster. No post-processing pass, so the canvas
+   * stays transparent over the page. 0 = no glow (the mobile default).
+   */
+  glow: 0.8,
+  glowMobile: 0,
   /** How quickly the morph chases the scroll position (higher = snappier). */
   damp: 4,
   /**
@@ -250,6 +259,10 @@ export function getParticleBrightness(): number {
   return isMobileViewport()
     ? PARTICLES.brightnessMobile
     : PARTICLES.brightness;
+}
+
+export function getParticleGlow(): number {
+  return isMobileViewport() ? PARTICLES.glowMobile : PARTICLES.glow;
 }
 
 export function getAmbientSize(): number {

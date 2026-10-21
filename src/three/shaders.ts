@@ -7,6 +7,7 @@ export const particleVertexShader = /* glsl */ `
   uniform float uMouseRadius;
   uniform float uMouseStrength;
   uniform float uTime;
+  uniform float uGlow;
   attribute float aRandom;
   varying float vRandom;
 
@@ -31,8 +32,9 @@ export const particleVertexShader = /* glsl */ `
 
     vec4 mv = viewMatrix * world;
     gl_Position = projectionMatrix * mv;
+    // The sprite grows by uGlow to leave room for the halo around the core
     gl_PointSize = uSize * mix(uSizeRange.x, uSizeRange.y, aRandom)
-      * uPixelRatio * (1.0 / -mv.z);
+      * uPixelRatio * (1.0 / -mv.z) * (1.0 + uGlow);
   }
 `;
 
@@ -40,15 +42,18 @@ export const particleFragmentShader = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
   uniform float uBrightness;
+  uniform float uGlow;
   varying float vRandom;
 
   void main() {
     float d = length(gl_PointCoord - 0.5);
     if (d > 0.5) discard;
-    float alpha = smoothstep(0.5, 0.05, d);
+    // Core keeps its original size; the halo fills the enlarged sprite
+    float core = smoothstep(0.5, 0.05, d * (1.0 + uGlow));
+    float halo = uGlow > 0.0 ? pow(1.0 - d * 2.0, 2.0) * 0.28 : 0.0;
     gl_FragColor = vec4(
       mix(uColorA, uColorB, vRandom) * uBrightness,
-      alpha * 0.85
+      core * 0.85 + halo
     );
   }
 `;
