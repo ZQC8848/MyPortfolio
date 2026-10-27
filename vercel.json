@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "qinchuan.vercel.app" }],
+      "destination": "https://qinchuan.dev/:path",
+      "permanent": true
+    },
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "www.qinchuan.dev" }],
+      "destination": "https://qinchuan.dev/:path",
+      "permanent": true
+    },
+    {
       "source": "/project/facade-vr",
       "destination": "/project/wrongest-person",
       "permanent": true
