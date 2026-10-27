@@ -1160,13 +1160,22 @@ export const projects: Project[] = [
   },
   {
     slug: "convis",
+    featured: true,
     title: "Convis: Drosophila Neuron Visualization",
-    tag: "Three.js · Visualization · 2025",
+    tag: "Three.js · Connectomics · Visualization · 2025",
     blurb:
-      "Web-based 3D visualization of fruit-fly neuron morphology for neuroscience teams.",
+      "A web tool for exploring the FlyWire fruit-fly connectome: thousands of 3D neuron morphologies linked to a classification Sankey and a UMAP of all 139,000 neurons.",
+    cover: "/projects/convis/cover.jpg",
+    demo: {
+      url: "https://convis.vercel.app/",
+      label: "Launch live demo",
+      note: "Best on desktop · loads about 19 MB of neuron data · the AI Analyze panel is switched off on the public demo",
+    },
     meta: [
-      { label: "Type", value: "Scientific Visualization" },
-      { label: "Stack", value: "Three.js · Web" },
+      { label: "Type", value: "Scientific Visualization · Connectomics" },
+      { label: "Data", value: "FlyWire FAFB v783 · 139,273 neurons" },
+      { label: "Stack", value: "Three.js · ECharts · Plotly · Vite · Python" },
+      { label: "Code", value: "github.com/lengyuner/ConVis" },
       { label: "Date", value: "2025 · ongoing" },
     ],
     sections: [
@@ -1174,19 +1183,47 @@ export const projects: Project[] = [
         heading: "Overview",
         body: (
           <>
-            An interactive web-based 3D tool for exploring the structural
-            morphology of fruit-fly (Drosophila) neurons, built with Three.js
-            to support neuroscience teams working with fly-brain data.
+            Convis is an interactive web tool for exploring the structure of
+            the fruit-fly (Drosophila) brain for neuroscience teams. It loads
+            the FlyWire FAFB v783 connectome, with 139,273 classified neurons,
+            and draws their skeletons in 3D next to two overview panels that
+            stay in sync with it: a Sankey diagram of the flow, super-class and
+            class hierarchy, and a UMAP embedding of connectivity or
+            morphology. Selecting neurons in any one view highlights them in
+            the other two.
           </>
         ),
+        image: {
+          src: "/projects/convis/interface.jpg",
+          caption:
+            "The default scene: 2,221 neurons coloured by class, with the Sankey, UMAP and neuron list alongside",
+        },
       },
       {
         heading: "Rendering at scale",
         body: (
           <>
-            Batch rendering keeps large neuron datasets interactive, with
-            real-time controls for filtering and inspecting individual
-            structures. Screenshots and a public demo are in progress.
+            The opening scene shows the first 100 neurons of each class,
+            2,221 in total. Skeletons are simplified offline and quantised into
+            one packed binary, so the browser reads each neuron on demand
+            instead of parsing thousands of SWC files. For the web build I
+            pruned that cache from 485 MB to 19 MB by keeping the initial scene
+            plus a class-balanced sample of small neurons, so the site can be
+            hosted statically. A volume mesh of the brain and a neuropil
+            selector give the neurons anatomical context.
+          </>
+        ),
+      },
+      {
+        heading: "Exploring and explaining",
+        body: (
+          <>
+            Neurons can be recoloured by flow, class, sub-class, cell type,
+            hemilineage or side, and expanded to their upstream and downstream
+            partners. External data such as gene expression or time series can
+            be imported and mapped onto the neurons with a colour map. A chat
+            panel sends the current selection to a Python pipeline that builds
+            a statistical report, then asks an LLM to interpret it.
           </>
         ),
       },
