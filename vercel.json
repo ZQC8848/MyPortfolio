@@ -15,7 +15,12 @@
     },
     {
       "source": "/project/facade-vr",
-      "destination": "/project/wrongest-person",
+      "destination": "/project/fragile",
+      "permanent": true
+    },
+    {
+      "source": "/project/wrongest-person",
+      "destination": "/project/fragile",
       "permanent": true
     }
   ],

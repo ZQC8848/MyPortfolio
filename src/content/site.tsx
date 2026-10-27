@@ -750,18 +750,17 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "wrongest-person",
+    slug: "fragile",
     featured: true,
-    title: "Wrongest Person",
+    title: "Fragile",
     tag: "AI Narrative · Web · In Development",
     blurb:
-      "A Façade-inspired 2D interactive drama driven by an LLM-based, trainable Drama Manager.",
-    cover: "/projects/wrongest-person/cover.png",
-    video: { type: "slides", id: "1sTbBGU0PDYkJOl3BOyUQpD7nso6j3ohi" },
+      "A Façade-inspired, turn-based interactive mystery steered by a trainable Drama Manager.",
+    cover: "/projects/fragile/cover.png",
     meta: [
       { label: "Team", value: "Qinchuan Zhang" },
-      { label: "Type", value: "Research · AI Narrative" },
-      { label: "Stack", value: "React · Phaser · FastAPI · LLM + TTS" },
+      { label: "Type", value: "Research · AI Narrative · USC CSCI 566" },
+      { label: "Stack", value: "React · FastAPI · LLMs · Python" },
       { label: "Status", value: "In development · 2026" },
     ],
     sections: [
@@ -769,105 +768,112 @@ export const projects: Project[] = [
         heading: "Overview",
         body: (
           <>
-            Wrongest Person is a research prototype for an LLM-driven,
-            trainable Drama Manager, inspired by Façade (Mateas &amp; Stern,
-            2005) — the landmark interactive drama in which a player, typing
-            in natural language, becomes entangled in the collapsing marriage
-            of an AI-driven couple. Façade remains a touchstone twenty years
-            on, yet almost no work has reproduced its particular achievement:
-            a freely conversational, fully-performed drama steered by an
-            invisible director. The reason was never vision but cost. Its two
-            authors spent roughly two person-years hand-writing every beat,
-            line, and reaction in a stack of custom languages, and its
-            &ldquo;broad and shallow&rdquo; parser still misread the player
-            often enough to break the fiction. This project argues that LLMs
-            now make it possible to confront that authorial bottleneck
-            directly, and tests the claim in a single tense scene: after
-            closing time at the Jade restaurant, a mother&apos;s lethal trap
-            is sprung by the wrong arrival — her own fifteen-year-old
-            daughter, May, whom the player controls.
+            Fragile is a research prototype for an LLM-driven, trainable
+            Drama Manager, inspired by Façade (Mateas &amp; Stern, 2005), the
+            landmark interactive drama in which a player, typing in natural
+            language, becomes entangled in the collapsing marriage of an
+            AI-driven couple. Façade&apos;s achievement has almost never been
+            reproduced, and the reason was never vision but cost: two authors
+            spent roughly two person-years hand-writing every beat, line, and
+            reaction, and its &ldquo;broad and shallow&rdquo; parser still
+            misread the player often enough to break the fiction. Fragile tests
+            whether LLMs can lift that authorial bottleneck, in a single scene
+            built on the bones of Hitchcock&apos;s <em>Rope</em>: the night
+            before Julian and Mia emigrate, you, an old college friend, come to
+            their farewell dinner, served on a shipping crate in an emptied
+            flat. Leo, the friend they invited, never shows up. Each turn you
+            write what you say and do; the system answers with the next
+            moment of the story in the first person, and the couple keeps
+            performing that nothing happened tonight.
           </>
         ),
         image: {
-          src: "/projects/wrongest-person/Scene.png",
-          caption: "The single-room stage — the Jade restaurant after hours",
+          src: "/projects/fragile/dinner-on-the-crate.jpg",
+          caption: "Dinner on the crate: one of the illustrated moments",
         },
       },
       {
         heading: "Drama Manager 2.0",
         body: (
           <>
-            At the system&apos;s core is a Drama Manager 2.0 that keeps
-            Façade&apos;s most durable abstraction — the beat, a minimal unit
-            of dramatic action selected against an Aristotelian tension arc —
-            while replacing its brittle internals. The manager pairs a frozen
-            LLM &ldquo;brain,&rdquo; which proposes and, when nothing on the
-            shelf fits, generates new beats, with a small trainable scoring
-            layer that learns the reward function the original hand-coded by
-            formula; human annotations of each playthrough (per-beat and
-            per-arc) train this layer, so the director&apos;s taste improves
-            with use rather than being frozen at authoring time. Inside each
-            beat, a fast LLM performs the scene live: the beat fixes the
-            dramatic intent and the story-state effects, while dialogue,
-            emotional register, and timing flex to whatever the player
-            actually says and does — same destination, improvised path.
+            At the core is a Drama Manager 2.0 that keeps Façade&apos;s most
+            durable abstraction, the beat, a minimal unit of dramatic action
+            chosen against an Aristotelian tension arc, while replacing its
+            brittle internals. A frozen LLM proposes beats and, when nothing on
+            the shelf fits, generates a new one; a trainable scorer chooses
+            among the eligible beats, learning the reward function that Façade
+            hand-coded as a formula. Inside a beat, the LLM performs the scene
+            live: the beat fixes the dramatic intent and its effects on the
+            story state, while the dialogue flexes to whatever the player
+            actually says. The four learned modules (beat scoring, input
+            understanding, consistency checking, tension estimation) each run
+            on a rule path, an LLM path, or a trained path, and can shadow one
+            another, so a trained model is compared against the others on the
+            same live turns before it takes over.
+          </>
+        ),
+      },
+      {
+        heading: "One turn",
+        body: (
+          <>
+            A turn runs through a fixed pipeline. The player&apos;s free text
+            is first read by an input reviewer that splits it into speech,
+            action, and expression, maps actions onto a closed table, and
+            refuses what a player cannot decide (another character&apos;s
+            actions, the outcome of an attempt, a convenient new object), each
+            time offering a rewrite. Deterministic world rules then resolve
+            where everyone is and who can hear you: the flat is a real floor
+            plan, and a whispered word on the balcony never reaches the
+            kitchen. Characters react within bounded steps of composure and
+            suspicion; the beat runner delivers the beat&apos;s next steps; the
+            Drama Manager picks what comes next when a beat ends; and a guard
+            checks every passage the narrator writes against what the player
+            has actually learned, rewriting it rather than let a secret slip.
+            Every decision, with all its candidates and their scores, is
+            logged for training.
           </>
         ),
         image: {
-          src: "/projects/wrongest-person/beat-1.png",
-          caption: "A single beat — the mother lacing a drink with poison",
+          src: "/projects/fragile/floor-plan.jpg",
+          caption: "The flat: rooms decide who sees and hears the player",
         },
       },
       {
-        heading: "Two layers of character",
+        heading: "Characters",
         body: (
           <>
-            The presentation splits each character into two fidelities.
-            During exploration, small Stardew-style sprites move around a
-            single restaurant map, approaching the bar, the red envelope, the
-            poisoned glass, the gun taped under the table — every action
-            becomes a clean, discrete event the Drama Manager can read (who
-            the player walked toward, how long they lingered, whether they
-            tried to leave). When a beat fires, the view cuts to dynamic
-            portraits: layered art in which eyes, brows, mouth, gaze, and body
-            lean are driven continuously by structured commands from the
-            manager — a preset like <em>suppressed_panic</em> at a given
-            intensity, a gaze target, a transition time — and the mouth is
-            synced to generated speech from audio amplitude. This keeps the
-            felt Façade quality of acting freely in a room and being answered
-            by living faces, while spending nothing on full-body animation
-            that would not advance the research question.
+            Julian and Mia stay on stage the whole evening, each pulling the
+            player into their own version of the day; Nora, Leo&apos;s younger
+            sister, arrives late, first as messages, then a call, then a knock
+            at the door. Every character keeps layered secrets, small ones
+            told to cover larger ones, and the ending follows from what the
+            player accumulated: whose side they took, how much came out, who
+            broke first, and what they told Nora.
           </>
         ),
         images: [
-          {
-            src: "/projects/wrongest-person/Character-Lin.png",
-            caption: "Lin — the mother",
-          },
-          {
-            src: "/projects/wrongest-person/Character-May.png",
-            caption: "May — the daughter",
-          },
+          { src: "/projects/fragile/julian.jpg", caption: "Julian" },
+          { src: "/projects/fragile/mia.jpg", caption: "Mia" },
+          { src: "/projects/fragile/nora.jpg", caption: "Nora" },
         ],
       },
       {
-        heading: "Architecture and research direction",
+        heading: "Learning from play",
         body: (
           <>
-            The front end is React and TypeScript with Phaser for the map,
-            movement, and interactables, and a separate canvas layer for
-            portraits; the Drama Manager is an independent Python service
-            connected over WebSocket. The front end never understands the
-            plot — it only performs generic commands — so the same back end
-            can later drive a 3D or VR stage. The prototype is framed around
-            four questions: can an LLM propose dramatically sensible new beats
-            from story state; does a learned scorer track tension better than
-            Façade&apos;s fixed weights; can dynamic expression faithfully
-            carry a beat&apos;s subtext; and can free player input and object
-            interaction feed a structured narrative without breaking
-            coherence. Embodied VR input — gaze, gesture, bodily presence —
-            remains the long-term direction once the core algorithm is
-            validated.
+            The scorer learns from two sources. Human annotators make
+            prefix-blind pairwise judgements: shown the story so far but never
+            what followed, they pick the better of two candidate beats at the
+            same point, so a judgement is not biased by how the session
+            happened to end. At scale, LLM players play whole sessions
+            against the engine: each player gets a personality sampled from
+            the HEXACO model with published human trait correlations, turned
+            into concrete behaviour rules and a goal for the evening, and the
+            player models rotate between providers so the data does not
+            collapse into one model&apos;s habits. An LLM judge, calibrated
+            against the human labels, turns these sessions into training
+            pairs for the scorer.
           </>
         ),
       },
