@@ -880,6 +880,176 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "openxr-agents",
+    featured: true,
+    title: "OpenXR Spec Agents",
+    tag: "Multi-Agent · RAG · MCP · 2026",
+    blurb:
+      "A supervisor-pattern multi-agent assistant for OpenXR developers: spec RAG, SQL over the extension registry, live web through MCP, and a hybrid router whose every decision is visible.",
+    cover: "/projects/openxr-agents/cover.jpg",
+    demo: {
+      url: "https://csci599-a2-yx4v2swwzq-uw.a.run.app/",
+      label: "Launch live demo",
+      note: "Scales to zero, so the first request after idle takes about 30 s · limited to 12 questions per minute per IP",
+    },
+    meta: [
+      { label: "Type", value: "Multi-Agent System · RAG · Evaluation" },
+      {
+        label: "Stack",
+        value: "LangGraph · FastAPI · Chroma · NVIDIA NIM · DeepSeek · Tavily MCP · Cloud Run",
+      },
+      { label: "Corpus", value: "OpenXR 1.1 spec · 2,855 chunks · 999 registry extensions" },
+      { label: "Date", value: "October 2026" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            OpenXR is a large, strict specification, and the questions
+            developers ask about it come in different shapes: what must happen
+            before <code>xrBeginSession</code>, how many released extensions a
+            vendor has, what changed in the latest SDK. A LangGraph supervisor
+            classifies each question and dispatches it to specialist agents. A
+            Research agent runs RAG over the OpenXR 1.1 spec and reaches the
+            live web through the Tavily remote MCP server. A Data agent writes
+            read-only SQL over the official extension registry. A Summary agent
+            reconciles their outputs into one answer that keeps its citations.
+          </>
+        ),
+        image: {
+          src: "/projects/openxr-agents/cover.jpg",
+          caption:
+            "A three-agent question (registry, then spec, then summary) with the supervisor plan, every routing decision, and per-provider cost and latency",
+        },
+      },
+      {
+        heading: "Routing you can see",
+        body: (
+          <>
+            Two providers share the work. NVIDIA NIM&apos;s free
+            Nemotron model handles the planner, SQL generation and short
+            answers; DeepSeek writes long multi-source syntheses and takes over
+            when NIM stalls. Each LLM call records which provider it went to,
+            on which dimension (cost, latency, capability or fallback) and why,
+            and the UI shows that next to a timestamped trace of every plan,
+            retrieval, MCP call and SQL query. A long RAG answer costs about
+            $0.0016 on DeepSeek, and many cost nothing.
+          </>
+        ),
+      },
+      {
+        heading: "Retrieval",
+        body: (
+          <>
+            The spec is split into 2,855 structure-aware chunks, each prefixed
+            with its section breadcrumb, embedded with NIM and stored in an
+            embedded Chroma index (k = 6). Every claim in an answer carries a
+            label that links to the exact chunk, with its similarity score.
+            An ablation showed that explicitly pinning identifiers into the
+            results added nothing: all 16 test queries already ranked the right
+            chunk first, because the breadcrumb prefix puts identifiers in the
+            chunk headings.
+          </>
+        ),
+      },
+      {
+        heading: "Measured, not assumed",
+        body: (
+          <>
+            The test set has 18 spec questions with reference answers and 8
+            routing checks. Over six RAGAS rounds the deployed routing reached
+            faithfulness 0.904, answer relevancy 0.892, context precision 0.792
+            and context recall 0.963. All 8 plans were routed correctly and the
+            registry counts matched gold SQL. Targeted probes lifted
+            planner routing from 10/20 to 30/30 and NIM-written SQL to 24/24
+            against gold queries. Five injected failures, from a Tavily
+            outage to an invented citation, all degrade gracefully.
+          </>
+        ),
+      },
+      {
+        heading: "What evaluation found",
+        body: (
+          <>
+            Evaluation kept finding real defects. A routing check that passed
+            had actually failed during a transient Tavily outage, which led to
+            a stricter check and an MCP retry. Failure injection exposed a
+            streaming deadline that fast chunks could never trip, and a
+            degraded path that guessed &ldquo;12&rdquo; for a count whose
+            true value was 19. The free model&apos;s throughput swung between
+            33 and 95 tokens per second, so routing follows measured latency
+            and failure modes rather than price alone.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    slug: "mcp-agent",
+    title: "Tool-Using MCP Agent",
+    tag: "Agents · MCP · Cloud Run · 2026",
+    blurb:
+      "A LangGraph agent that picks tools across four real MCP servers, remembers each session, and survives broken servers. Deployed on Cloud Run.",
+    meta: [
+      { label: "Type", value: "Agent · MCP · Cloud Deployment" },
+      {
+        label: "Stack",
+        value: "LangGraph · FastAPI · langchain-mcp-adapters · NVIDIA NIM · Cloud Run",
+      },
+      { label: "MCP servers", value: "Filesystem · Tavily · Fetch · Open-Meteo weather" },
+      { label: "Date", value: "2026" },
+    ],
+    sections: [
+      {
+        heading: "Overview",
+        body: (
+          <>
+            An LLM agent that reasons over each query, decides which tools it
+            needs, and calls them through the Model Context Protocol. Four
+            existing MCP servers are connected: filesystem, Tavily search,
+            fetch and Open-Meteo weather. They compose into real chains, such
+            as reading a CSV of cities, fetching the weather for each, and
+            saving a summary to a file. A session id keeps the conversation
+            across turns, and the service runs on Cloud Run behind a single{" "}
+            <code>POST /chat</code>.
+          </>
+        ),
+      },
+      {
+        heading: "Design",
+        body: (
+          <>
+            The graph is a hand-built LangGraph loop, <code>llm</code> then{" "}
+            <code>tools</code> then back, rather than the prebuilt agent,
+            because the prebuilt one exposed no way to turn tool exceptions
+            into messages the model can act on. Tools are discovered per server
+            with <code>tools/list</code>, and an allowlist hands the model 13
+            of the 28 available tools: fewer wrong picks, fewer prompt tokens,
+            and no costly crawl tools it never needs.
+          </>
+        ),
+      },
+      {
+        heading: "When servers misbehave",
+        body: (
+          <>
+            A server that fails to start is skipped and reported as degraded
+            instead of taking the app down. Transport drops, tool errors and
+            schema-breaking replies come back to the model as readable error
+            messages, so it can explain or try another tool. One failure mode
+            was silent: the MCP SDK drops an unparsable line without failing
+            the request, so a malformed reply would hang forever without a 30
+            second read timeout. A hand-written broken MCP server, which
+            returns <code>isError</code>, garbage, invalid results or dies
+            mid-call, drives 21 offline tests, and a 12-check smoke test
+            passes locally, in the container and on the live service.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     slug: "call-me-merlin",
     featured: true,
     title: "Call Me Merlin",
@@ -951,7 +1121,6 @@ export const projects: Project[] = [
   },
   {
     slug: "vr-haptic-research",
-    featured: true,
     title: "Vibrotactile Texture Perception in VR",
     tag: "Haptics Research · XR · 2026",
     blurb:
@@ -1612,9 +1781,9 @@ export const site = {
   email: "qinchuan@usc.edu",
 
   meta: {
-    title: "Qinchuan Zhang — Portfolio",
+    title: "Qinchuan Zhang 张秦川 — XR, AI & Game Developer",
     description:
-      "Qinchuan (Qin) Zhang — XR, AI & game developer. M.S. Computer Science at USC, Research Assistant at Ganek Immersive Studio. Immersive experiences where XR, AI & play converge.",
+      "Qinchuan Zhang (张秦川) — XR, AI & game developer. M.S. Computer Science at USC, Development Lead at Ganek Immersive Studio. Immersive experiences where XR, AI & play converge.",
   },
 
   nav: [
@@ -1646,23 +1815,23 @@ export const site = {
     index: "01 — About",
     lead: (
       <>
-        I build human-centered immersive systems where XR, AI, and game
-        design meet.
+        I make software that responds to your hands and to the room you&apos;re
+        standing in.
       </>
     ),
-    sub: "M.S. Computer Science at USC · Research Assistant at Ganek Immersive Studio, USC School of Cinematic Arts",
+    sub: "M.S. Computer Science at USC · Development Lead at Ganek Immersive Studio, USC School of Cinematic Arts",
     columns: [
       {
         heading: "XR",
-        body: "VR, MR, and AR across Quest 3, Vision Pro, and AR Spectacles — spatial alignment between virtual and real, hand-tracked interaction, haptics research, and multiplayer presence that holds up outside the lab.",
+        body: "A headset turns a room into an interface. I work on the hard parts of that: hand tracking that holds up, virtual space that lines up with the physical one, and several people seeing the same thing in the same place.",
       },
       {
         heading: "AI",
-        body: "Generative worlds and narrative: Gaussian Splatting world models that restyle real rooms, real-time sign-language recognition, voice-controlled gameplay — and LLM-driven interactive drama in VR as my current research focus.",
+        body: "A model can generate a world, a script or a plan, and it can get any of them wrong. I build the system around it: structure that gives the model something to work from, and checks that catch a mistake before anyone sees it. The aim is a generated room, story or assembly guide that someone can rely on.",
       },
       {
         heading: "Game",
-        body: "Gameplay engineering and networked multiplayer in Unity and Unreal — spells cast by hand-drawn gestures, football played with foot trackers — built fast at hackathons like MIT Reality Hack and polished for the expo floor.",
+        body: "Games are where I test an idea fastest, because a player tells you within a minute whether it works. I like controls that use the body, such as a gesture drawn in the air, a kick or an open hand, and multiplayer that stays in step so two people feel they share the same moment.",
       },
     ],
   },
