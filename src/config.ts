@@ -90,7 +90,7 @@ export interface ShapeKeyframe {
  * it rocks); omit either to inherit the PARTICLES defaults.
  */
 export const SHAPE_KEYFRAMES: readonly ShapeKeyframe[] = [
-  { shape: "david", hold: 0.04 ,scale:0.9,scaleMobile:1.5},
+  { shape: "david", scale:0.9,scaleMobile:1.5},
   { shape: "explode" },
   { shape: "quest3", anchor: "#about", hold: 0.12, offset: [4.5, 4, 0] , scale:0.6 ,offsetMobile: [0,0,0] ,scaleMobile:1.2},
   { shape: "explode", hold:0.12 },
