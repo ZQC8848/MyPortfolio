@@ -5,6 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Nav from "./components/Nav";
 import Home from "./pages/Home";
 import Project from "./pages/Project";
+import { applyHead } from "./lib/seo";
 
 // Lazy-loaded so three.js lands in its own chunk and text content paints first.
 const ParticleBackground = lazy(() => import("./three/ParticleBackground"));
@@ -39,10 +40,18 @@ function ScrollManager() {
   return null;
 }
 
+/** Per-route title, description and canonical, kept in sync on client navigation. */
+function RouteHead() {
+  const { pathname } = useLocation();
+  useEffect(() => applyHead(pathname), [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <ScrollProvider>
       <ScrollManager />
+      <RouteHead />
       <ErrorBoundary fallback={null}>
         <Suspense fallback={null}>
           <ParticleBackground />
